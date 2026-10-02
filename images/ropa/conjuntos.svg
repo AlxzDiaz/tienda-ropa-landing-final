@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 800" width="600" height="800">
+  <rect width="600" height="800" fill="#EFE6DA"/>
+  <circle cx="300" cy="380" r="230" fill="#F8F3EC"/>
+  <path d="M285 150a15 15 0 1 1 22 13c-4 2-7 6-7 11v10" fill="none" stroke="#A9472A" stroke-width="8" stroke-linecap="round"/><path d="M300 184 175 270h250Z" fill="none" stroke="#A9472A" stroke-width="8" stroke-linejoin="round"/><path d="M235 290h130l-10 300h-50l-5-200-5 200h-50Z" fill="#D9CBB8"/>
+  <text x="300" y="730" text-anchor="middle" font-family="Georgia, serif" font-style="italic" font-size="34" fill="#A9472A">Conjuntos</text>
+</svg>

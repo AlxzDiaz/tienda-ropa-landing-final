@@ -1,0 +1,518 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <!-- SEO: cambia título, descripción e imagen por cada cliente -->
+  <title>Wayra Studio · Ropa de lino y estampados tropicales en Puerto Maldonado</title>
+  <meta name="description" content="Vestidos de lino, blusas y pantalones frescos para el calor de la selva. Elige tu talla y pide por WhatsApp: delivery el mismo día en Puerto Maldonado y envíos a todo el Perú.">
+  <meta name="theme-color" content="#1A1411">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Wayra Studio · Moda fresca en Puerto Maldonado">
+  <meta property="og:description" content="Mira la colección, elige tu talla y pide por WhatsApp. Envíos a todo el Perú.">
+  <meta property="og:image" content="https://images.unsplash.com/photo-1767396858128-85b1262a7677?auto=format&fit=crop&w=1200&h=630&q=70">
+  <link rel="icon" href="images/favicon.svg" type="image/svg+xml">
+
+  <!-- Tipografías: Bodoni Moda (títulos, estilo revista de moda) + Manrope (texto) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="preconnect" href="https://images.unsplash.com">
+  <link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,500;0,6..96,600;0,6..96,700;1,6..96,500;1,6..96,600&family=Manrope:wght@400;500;700;800&display=swap" rel="stylesheet">
+
+  <!-- Librerías: Phosphor Icons (íconos) + AOS (animaciones al hacer scroll) -->
+  <link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/regular/style.css">
+  <link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/fill/style.css">
+  <link rel="stylesheet" href="https://unpkg.com/aos@2.3.4/dist/aos.css">
+
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+  <a class="skip" href="#coleccion">Saltar a la colección</a>
+
+  <!-- ============ ANUNCIO (mensajes que rotan) ============ -->
+  <div class="anuncio" id="anuncio" aria-live="polite">
+    <i class="ph ph-sparkle" aria-hidden="true"></i><span id="anuncio-txt"></span>
+  </div>
+
+  <!-- ============ HEADER ============ -->
+  <header class="header" id="header">
+    <div class="container header__inner">
+      <a href="#inicio" class="logo">
+        <img src="images/logo.svg" width="44" height="44" alt="">
+        <span class="logo__texto">
+          <span class="logo__nombre" data-logo>Wayra Studio</span>
+          <span class="logo__eslogan" data-config="eslogan">Moda fresca · Puerto Maldonado</span>
+        </span>
+      </a>
+
+      <nav class="nav" id="nav" aria-label="Principal">
+        <ul>
+          <li><a href="#coleccion">Colección</a></li>
+          <li><a href="#looks">Looks</a></li>
+          <li><a href="#nosotros">Nosotros</a></li>
+          <li><a href="#opiniones">Opiniones</a></li>
+          <li><a href="#tienda">Tienda</a></li>
+        </ul>
+      </nav>
+
+      <button class="icono-btn" id="favs-btn" type="button" aria-label="Ver mis favoritos">
+        <i class="ph ph-heart" aria-hidden="true"></i>
+        <span class="icono-btn__n" id="favs-n" hidden>0</span>
+      </button>
+      <button class="icono-btn" id="bolsa-btn" type="button" aria-label="Ver mi bolsa">
+        <i class="ph ph-tote-simple" aria-hidden="true"></i>
+        <span class="icono-btn__n" id="bolsa-n" hidden>0</span>
+      </button>
+      <a class="btn btn--wa header__cta" data-wa="Hola, quiero asesoría para elegir mi talla." href="#">
+        <i class="ph-fill ph-whatsapp-logo" aria-hidden="true"></i><span>Asesoría</span>
+      </a>
+      <button class="nav-toggle" id="nav-toggle" type="button" aria-controls="nav" aria-expanded="false" aria-label="Abrir menú">
+        <i class="ph ph-list ico-abrir" aria-hidden="true"></i>
+        <i class="ph ph-x ico-cerrar" aria-hidden="true"></i>
+      </button>
+    </div>
+  </header>
+
+  <main>
+    <!-- ============ HERO ============ -->
+    <section class="hero" id="inicio">
+      <div class="container hero__grid">
+        <div class="hero__texto">
+          <a class="rating" id="rating" href="#opiniones"></a>
+          <h1 data-aos="fade-up">Ropa <em>fresca</em> para el calor de la selva</h1>
+          <p class="hero__sub" data-aos="fade-up" data-aos-delay="100">Vestidos de lino, blusas con estampados tropicales y pantalones que respiran. Elige tu talla, arma tu bolsa y confírmala por WhatsApp.</p>
+          <div class="hero__acciones" data-aos="fade-up" data-aos-delay="200">
+            <a class="btn btn--primario btn--lg" href="#coleccion"><i class="ph ph-coat-hanger" aria-hidden="true"></i>Ver la colección</a>
+            <a class="btn btn--borde btn--lg" href="#looks"><i class="ph ph-sparkle" aria-hidden="true"></i>Looks armados</a>
+          </div>
+          <ul class="hero__trust" data-aos="fade-up" data-aos-delay="300">
+            <li class="estado" id="estado"></li>
+            <li><i class="ph ph-truck" aria-hidden="true"></i>Envíos a todo el Perú</li>
+            <li><i class="ph ph-arrows-clockwise" aria-hidden="true"></i><span>Cambios en <span id="cambios-dias"></span> días</span></li>
+          </ul>
+        </div>
+
+        <div class="hero__visual" data-aos="zoom-in" data-aos-delay="150">
+          <!-- Fotos de portada: cámbialas por fotos reales de la colección del cliente -->
+          <figure class="hero__foto hero__foto--principal">
+            <img src="https://images.unsplash.com/photo-1767396858128-85b1262a7677?auto=format&fit=crop&crop=faces&w=760&h=920&q=70"
+                 data-fallback="images/ropa/vestidos.svg" alt="Mujer sonriente con vestido claro entre palmeras" width="560" height="680" fetchpriority="high">
+          </figure>
+          <figure class="hero__foto hero__foto--mini">
+            <img src="https://images.unsplash.com/photo-1566446687891-0bad218d0cbe?auto=format&fit=crop&w=420&h=520&q=70"
+                 data-fallback="images/ropa/vestidos.svg" alt="Mujer con vestido blanco caminando por un sendero tropical" width="210" height="260">
+          </figure>
+          <!-- Sello circular que gira -->
+          <svg class="sello-giro" viewBox="0 0 120 120" aria-hidden="true">
+            <defs><path id="circulo" d="M60,60 m-44,0 a44,44 0 1,1 88,0 a44,44 0 1,1 -88,0"/></defs>
+            <text><textPath href="#circulo">Nueva colección · Primavera 2026 ·</textPath></text>
+          </svg>
+          <div class="flotante">
+            <span class="flotante__ico"><i class="ph-fill ph-leaf" aria-hidden="true"></i></span>
+            <span><strong>Lino que respira</strong><small>Fresco hasta a 35 °C</small></span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ CINTA ============ -->
+    <div class="cinta" aria-hidden="true">
+      <div class="cinta__pista" id="cinta"></div>
+    </div>
+
+    <!-- ============ CATEGORÍAS ============ -->
+    <section class="seccion seccion--compacta" id="categorias" aria-labelledby="cat-titulo">
+      <div class="container">
+        <header class="seccion__head seccion__head--fila" data-aos="fade-up">
+          <div>
+            <span class="eyebrow">Compra por categoría</span>
+            <h2 id="cat-titulo">¿Qué estás <em>buscando</em>?</h2>
+          </div>
+        </header>
+        <ul class="categorias" id="categorias-lista"></ul>
+      </div>
+    </section>
+
+    <!-- ============ OFERTA CON CUENTA REGRESIVA ============ -->
+    <section class="seccion seccion--compacta" id="promo">
+      <div class="container">
+        <article class="promo" data-aos="fade-up">
+          <div class="promo__texto">
+            <span class="eyebrow eyebrow--oscura"><i class="ph-fill ph-tag" aria-hidden="true"></i> <span id="promo-titulo"></span></span>
+            <h2>Hasta <em id="promo-max">25% menos</em> en piezas seleccionadas</h2>
+            <p id="promo-texto"></p>
+            <div class="cuenta" id="cuenta" role="timer" aria-label="Tiempo que queda de la oferta">
+              <div><strong data-u="d">00</strong><span>días</span></div>
+              <div><strong data-u="h">00</strong><span>horas</span></div>
+              <div><strong data-u="m">00</strong><span>min</span></div>
+              <div><strong data-u="s">00</strong><span>seg</span></div>
+            </div>
+            <button class="btn btn--dorado btn--lg" type="button" id="promo-ver"><i class="ph ph-tag" aria-hidden="true"></i>Ver las ofertas</button>
+          </div>
+          <div class="promo__media">
+            <img id="promo-img" alt="" loading="lazy" decoding="async" data-fallback="images/ropa/vestidos.svg">
+            <span class="promo__sello">Hasta<strong id="promo-sello">-25%</strong></span>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <!-- ============ COLECCIÓN ============ -->
+    <section class="seccion seccion--lino" id="coleccion">
+      <div class="container">
+        <header class="seccion__head" data-aos="fade-up">
+          <span class="eyebrow">Colección Primavera 2026</span>
+          <h2>Elige tu prenda, tu color y <em>tu talla</em></h2>
+          <p>Toca una prenda para ver sus colores y tallas disponibles. Guarda tus favoritas con el <i class="ph-fill ph-heart" aria-label="corazón"></i>.</p>
+        </header>
+
+        <div class="barra-filtros">
+          <div class="filtros" id="filtros" role="group" aria-label="Filtrar por categoría"></div>
+        </div>
+        <div class="orden">
+          <span class="orden__n" id="conteo" aria-live="polite"></span>
+          <label class="orden__sel">
+            <span class="sr-only">Ordenar por</span>
+            <i class="ph ph-sort-ascending" aria-hidden="true"></i>
+            <select id="orden">
+              <option value="destacados">Destacados</option>
+              <option value="nuevos">Novedades</option>
+              <option value="menor">Menor precio</option>
+              <option value="mayor">Mayor precio</option>
+            </select>
+          </label>
+        </div>
+
+        <ul class="productos" id="productos"></ul>
+        <div class="sin-resultados" id="sin-resultados" hidden>
+          <i class="ph ph-heart" aria-hidden="true"></i>
+          <p>Todavía no tienes favoritos. Toca el corazón de una prenda para guardarla aquí.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ LOOKS ============ -->
+    <section class="seccion" id="looks">
+      <div class="container">
+        <header class="seccion__head" data-aos="fade-up">
+          <span class="eyebrow">Looks armados</span>
+          <h2>Llévate el look completo y <em>ahorra</em></h2>
+          <p>Combinaciones que elegimos por ti. Escoge la talla de cada pieza y agrégalas juntas con descuento.</p>
+        </header>
+        <div class="looks-tabs" id="looks-tabs" role="tablist" aria-label="Looks"></div>
+        <div id="looks-paneles"></div>
+      </div>
+    </section>
+
+    <!-- ============ BENEFICIOS ============ -->
+    <section class="beneficios-wrap" aria-label="Beneficios de comprar con nosotros">
+      <div class="container">
+        <ul class="beneficios">
+          <li data-aos="fade-up"><i class="ph ph-arrows-clockwise" aria-hidden="true"></i><div><strong>Cambios fáciles</strong><span id="ben-cambios"></span></div></li>
+          <li data-aos="fade-up" data-aos-delay="80"><i class="ph ph-truck" aria-hidden="true"></i><div><strong>Envíos a todo el Perú</strong><span id="ben-envios"></span></div></li>
+          <li data-aos="fade-up" data-aos-delay="160"><i class="ph ph-wallet" aria-hidden="true"></i><div><strong>Paga como quieras</strong><span id="ben-pagos"></span></div></li>
+          <li data-aos="fade-up" data-aos-delay="240"><i class="ph ph-chats-circle" aria-hidden="true"></i><div><strong>Asesoría de talla</strong><span>Te ayudamos por WhatsApp, gratis</span></div></li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- ============ NOSOTROS ============ -->
+    <section class="seccion seccion--lino" id="nosotros">
+      <div class="container nosotros">
+        <div class="nosotros__media" data-aos="fade-up">
+          <!-- Foto de la tienda o del equipo del cliente -->
+          <img src="https://images.unsplash.com/photo-1769107805465-bfd41863f1a0?auto=format&fit=crop&w=900&h=1000&q=70"
+               data-fallback="images/ropa/conjuntos.svg" alt="Interior de la tienda con prendas de lino colgadas y un cactus" loading="lazy" decoding="async" width="900" height="1000">
+          <span class="nosotros__sello"><i class="ph-fill ph-medal" aria-hidden="true"></i>Desde 2020</span>
+        </div>
+        <div class="nosotros__texto" data-aos="fade-up" data-aos-delay="100">
+          <span class="eyebrow">Nuestra historia</span>
+          <h2>Nació de una idea simple: <em>vestir bien sin sudar</em></h2>
+          <p>Wayra empezó con un perchero en una feria de Puerto Maldonado. Buscábamos ropa bonita que aguantara el calor de la selva y no la encontrábamos, así que empezamos a traerla nosotras.</p>
+          <p>Hoy elegimos cada prenda a mano: telas naturales, cortes cómodos y colores inspirados en la Amazonía. <em class="firma">Wayra</em> significa “viento” en quechua: eso queremos que sientas al ponértela.</p>
+          <ul class="logros" id="logros"></ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ OPINIONES ============ -->
+    <section class="seccion" id="opiniones">
+      <div class="container">
+        <header class="seccion__head" data-aos="fade-up">
+          <span class="eyebrow">Opiniones</span>
+          <h2>Clientas que <em>repiten</em></h2>
+        </header>
+        <div class="resumen-rating" id="resumen-rating" data-aos="fade-up"></div>
+        <ul class="testimonios" id="testimonios"></ul>
+      </div>
+    </section>
+
+    <!-- ============ COMUNIDAD (INSTAGRAM) ============ -->
+    <section class="seccion seccion--oscura" id="comunidad">
+      <div class="container">
+        <header class="seccion__head" data-aos="fade-up">
+          <span class="eyebrow">Comunidad</span>
+          <h2>Así se ve <em id="hashtag"></em></h2>
+          <p>Etiquétanos en Instagram <a id="ig-link" href="#" target="_blank" rel="noopener"></a> y aparece aquí.</p>
+        </header>
+        <div class="comunidad" id="comunidad-grid"></div>
+      </div>
+    </section>
+
+    <!-- ============ PREGUNTAS FRECUENTES ============ -->
+    <section class="seccion seccion--lino" id="preguntas">
+      <div class="container preguntas">
+        <header class="seccion__head preguntas__head" data-aos="fade-up">
+          <span class="eyebrow">Preguntas frecuentes</span>
+          <h2>Antes de comprar, <em>resuelve tus dudas</em></h2>
+          <p>¿No encuentras tu respuesta? Escríbenos y te contestamos en minutos.</p>
+          <a class="btn btn--wa" data-wa="Hola, tengo una consulta sobre una prenda." href="#"><i class="ph-fill ph-whatsapp-logo" aria-hidden="true"></i>Preguntar por WhatsApp</a>
+        </header>
+        <div class="faq" id="faq" data-aos="fade-up" data-aos-delay="100"></div>
+      </div>
+    </section>
+
+    <!-- ============ TIENDA FÍSICA ============ -->
+    <section class="seccion" id="tienda">
+      <div class="container">
+        <header class="seccion__head" data-aos="fade-up">
+          <span class="eyebrow">Visítanos</span>
+          <h2>Pruébatelo en <em>nuestra tienda</em></h2>
+        </header>
+        <div class="ubicacion">
+          <div class="tarjeta" data-aos="fade-up">
+            <h3><i class="ph ph-clock" aria-hidden="true"></i> Horario de atención</h3>
+            <table class="horarios">
+              <caption class="sr-only">Horario de atención</caption>
+              <tbody id="tabla-horarios"></tbody>
+            </table>
+            <h3><i class="ph ph-map-pin" aria-hidden="true"></i> Dirección</h3>
+            <p class="direccion" id="direccion"></p>
+            <h3><i class="ph ph-wallet" aria-hidden="true"></i> Medios de pago</h3>
+            <ul class="pagos" id="pagos"></ul>
+            <a class="btn btn--oscuro" id="como-llegar" href="#" target="_blank" rel="noopener"><i class="ph ph-navigation-arrow" aria-hidden="true"></i>Cómo llegar</a>
+          </div>
+          <iframe class="mapa" id="mapa" title="Mapa de ubicación de la tienda" loading="lazy" referrerpolicy="no-referrer-when-downgrade" data-aos="fade-up" data-aos-delay="100"></iframe>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ CTA FINAL ============ -->
+    <section class="cta-final">
+      <div class="container">
+        <div class="cta-final__inner" data-aos="zoom-in">
+          <h2>¿No sabes qué talla o qué combinar? <em>Te asesoramos</em> gratis.</h2>
+          <p>Cuéntanos para qué ocasión es y te mandamos opciones con fotos reales por WhatsApp.</p>
+          <a class="btn btn--wa btn--lg" data-wa="Hola, quiero que me ayuden a elegir un look. La ocasión es: " href="#"><i class="ph-fill ph-whatsapp-logo" aria-hidden="true"></i>Quiero asesoría</a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- ============ FOOTER ============ -->
+  <footer class="footer" id="contacto">
+    <div class="container footer__grid">
+      <div>
+        <a href="#inicio" class="logo logo--footer">
+          <img src="images/logo.svg" width="44" height="44" alt="">
+          <span class="logo__texto">
+            <span class="logo__nombre" data-logo>Wayra Studio</span>
+            <span class="logo__eslogan" data-config="eslogan">Moda fresca · Puerto Maldonado</span>
+          </span>
+        </a>
+        <p class="footer__desc">Ropa de lino y estampados tropicales, elegida a mano para el calor de la Amazonía.</p>
+        <div class="redes">
+          <a data-red="facebook" href="#" target="_blank" rel="noopener" aria-label="Facebook"><i class="ph-fill ph-facebook-logo" aria-hidden="true"></i></a>
+          <a data-red="instagram" href="#" target="_blank" rel="noopener" aria-label="Instagram"><i class="ph ph-instagram-logo" aria-hidden="true"></i></a>
+          <a data-red="tiktok" href="#" target="_blank" rel="noopener" aria-label="TikTok"><i class="ph-fill ph-tiktok-logo" aria-hidden="true"></i></a>
+        </div>
+      </div>
+      <div>
+        <h3>Comprar</h3>
+        <ul class="footer__lista" id="footer-categorias"></ul>
+      </div>
+      <div>
+        <h3>Horario</h3>
+        <ul class="footer__lista" id="footer-horarios"></ul>
+      </div>
+      <div>
+        <h3>Contacto</h3>
+        <ul class="footer__lista">
+          <li><i class="ph ph-phone" aria-hidden="true"></i><a id="tel" href="#"><span data-config="telefono"></span></a></li>
+          <li><i class="ph ph-whatsapp-logo" aria-hidden="true"></i><a data-wa href="#">Escríbenos por WhatsApp</a></li>
+          <li><i class="ph ph-map-pin" aria-hidden="true"></i><span id="footer-direccion"></span></li>
+        </ul>
+      </div>
+    </div>
+    <div class="container footer__legal">
+      <span>© <span id="anio">2026</span> <span data-config="nombre">Wayra Studio</span>. Todos los derechos reservados.</span>
+      <span>Hecho con <i class="ph-fill ph-heart" aria-hidden="true"></i> en Puerto Maldonado</span>
+    </div>
+  </footer>
+
+  <!-- ============ BOTÓN FLOTANTE DE WHATSAPP ============ -->
+  <a class="fab" id="fab" data-wa href="#" aria-label="Escríbenos por WhatsApp">
+    <i class="ph-fill ph-whatsapp-logo" aria-hidden="true"></i>
+  </a>
+
+  <!-- ============ BARRA DE LA BOLSA ============ -->
+  <button class="barra" id="barra" type="button" hidden>
+    <span class="barra__n" id="barra-n">0</span>
+    <span class="barra__txt">Ver mi bolsa</span>
+    <strong class="barra__total" id="barra-total"></strong>
+    <i class="ph ph-caret-right" aria-hidden="true"></i>
+  </button>
+
+  <!-- ============ VISTA RÁPIDA DE PRENDA ============ -->
+  <dialog class="modal" id="modal-prenda" aria-labelledby="pv-nombre">
+    <div class="modal__panel prenda-vista">
+      <button class="modal__cerrar" type="button" data-cerrar aria-label="Cerrar"><i class="ph ph-x" aria-hidden="true"></i></button>
+      <div class="pv__galeria">
+        <div class="pv__principal">
+          <img id="pv-img" alt="" width="600" height="800">
+          <span class="pv__tags" id="pv-tags"></span>
+        </div>
+        <div class="pv__miniaturas" id="pv-miniaturas"></div>
+      </div>
+      <div class="pv__info">
+        <p class="pv__cat" id="pv-cat"></p>
+        <h2 id="pv-nombre"></h2>
+        <div class="precio precio--grande" id="pv-precio"></div>
+        <p class="pv__desc" id="pv-desc"></p>
+
+        <div class="pv__grupo">
+          <p class="pv__label">Color: <strong id="pv-color-nombre"></strong></p>
+          <div class="swatches swatches--grandes" id="pv-colores" role="radiogroup" aria-label="Color"></div>
+        </div>
+
+        <div class="pv__grupo" id="pv-grupo-tallas">
+          <div class="pv__label-fila">
+            <p class="pv__label" id="pv-talla-label">Talla: <strong id="pv-talla-nombre">elige una</strong></p>
+            <button class="link-btn" type="button" id="pv-guia"><i class="ph ph-ruler" aria-hidden="true"></i>Guía de tallas</button>
+          </div>
+          <div class="tallas" id="pv-tallas" role="radiogroup" aria-labelledby="pv-talla-label"></div>
+          <p class="pv__error" id="pv-error" role="alert"></p>
+        </div>
+
+        <div class="pv__acciones">
+          <div class="stepper stepper--claro" aria-label="Cantidad">
+            <button type="button" id="pv-menos" aria-label="Una unidad menos"><i class="ph ph-minus"></i></button>
+            <span id="pv-cantidad">1</span>
+            <button type="button" id="pv-mas" aria-label="Una unidad más"><i class="ph ph-plus"></i></button>
+          </div>
+          <button class="btn btn--primario btn--lg pv__agregar" type="button" id="pv-agregar"><i class="ph ph-tote-simple" aria-hidden="true"></i>Agregar a la bolsa</button>
+          <button class="fav-btn fav-btn--grande" type="button" id="pv-fav" aria-pressed="false" aria-label="Guardar en favoritos"><i class="ph ph-heart" aria-hidden="true"></i></button>
+        </div>
+
+        <p class="pv__entrega" id="pv-entrega"></p>
+        <div class="pv__links">
+          <a class="pv__preguntar" id="pv-preguntar" href="#" target="_blank" rel="noopener"><i class="ph ph-whatsapp-logo" aria-hidden="true"></i>¿Dudas? Pregúntanos</a>
+          <button class="link-btn" type="button" id="pv-compartir"><i class="ph ph-share-network" aria-hidden="true"></i><span>Compartir</span></button>
+        </div>
+
+        <details class="pv__detalle">
+          <summary>Material y cuidado</summary>
+          <p id="pv-material"></p>
+        </details>
+      </div>
+    </div>
+  </dialog>
+
+  <!-- ============ GUÍA DE TALLAS ============ -->
+  <dialog class="modal modal--chico" id="modal-guia" aria-labelledby="guia-titulo">
+    <div class="modal__panel guia">
+      <button class="modal__cerrar" type="button" data-cerrar aria-label="Cerrar"><i class="ph ph-x" aria-hidden="true"></i></button>
+      <h2 id="guia-titulo">Guía de <em>tallas</em></h2>
+      <p>Medidas del cuerpo en centímetros.</p>
+      <table class="tabla-tallas" id="tabla-tallas"></table>
+      <p class="guia__consejo" id="guia-consejo"></p>
+      <a class="btn btn--wa btn--bloque" data-wa="Hola, ¿me ayudan con mi talla? Mis medidas son: busto __, cintura __, cadera __." href="#"><i class="ph-fill ph-whatsapp-logo" aria-hidden="true"></i>Envíanos tus medidas</a>
+    </div>
+  </dialog>
+
+  <!-- ============ BOLSA DE COMPRAS ============ -->
+  <dialog class="drawer" id="drawer" aria-labelledby="drawer-titulo">
+    <form class="drawer__panel" id="form-pedido" novalidate>
+      <header class="drawer__head">
+        <h2 id="drawer-titulo">Tu bolsa</h2>
+        <button class="drawer__cerrar" type="button" data-cerrar aria-label="Cerrar"><i class="ph ph-x" aria-hidden="true"></i></button>
+      </header>
+
+      <div class="progreso" id="progreso">
+        <p id="progreso-txt"></p>
+        <div class="progreso__barra"><span id="progreso-fill"></span></div>
+      </div>
+
+      <div class="drawer__cuerpo">
+        <ul class="items" id="items"></ul>
+        <div class="vacio" id="vacio" hidden>
+          <i class="ph ph-tote-simple" aria-hidden="true"></i>
+          <p>Tu bolsa está vacía.</p>
+          <button class="btn btn--oscuro" type="button" id="vacio-ver">Ver la colección</button>
+        </div>
+
+        <div id="checkout">
+          <div class="cupon" id="cupon-bloque">
+            <label class="campo campo--cupon">¿Tienes un cupón?
+              <span class="cupon__fila">
+                <input name="cupon" id="cupon-input" autocomplete="off" placeholder="Ej: WAYRA10" autocapitalize="characters">
+                <button class="btn btn--oscuro" type="button" id="cupon-aplicar">Aplicar</button>
+              </span>
+            </label>
+            <p class="cupon__msg" id="cupon-msg" aria-live="polite"></p>
+          </div>
+
+          <fieldset class="entrega">
+            <legend>¿Cómo lo recibes?</legend>
+            <label><input type="radio" name="entrega" value="local" checked><span><i class="ph ph-moped" aria-hidden="true"></i>Delivery<small id="entrega-local-sub"></small></span></label>
+            <label><input type="radio" name="entrega" value="provincia"><span><i class="ph ph-package" aria-hidden="true"></i>A provincia<small id="entrega-prov-sub"></small></span></label>
+            <label><input type="radio" name="entrega" value="recojo"><span><i class="ph ph-storefront" aria-hidden="true"></i>Recojo<small>En tienda</small></span></label>
+          </fieldset>
+
+          <label class="campo">Tu nombre
+            <input name="nombre" autocomplete="name" required placeholder="Ej: Ana Torres">
+          </label>
+          <label class="campo" data-entrega="local">Dirección de entrega
+            <input name="direccion" autocomplete="street-address" placeholder="Calle, número y referencia">
+          </label>
+          <div class="campo-fila" data-entrega="provincia">
+            <label class="campo">Ciudad de destino
+              <input name="ciudad" autocomplete="address-level2" placeholder="Ej: Cusco">
+            </label>
+            <label class="campo">Agencia
+              <select name="agencia" id="select-agencia"></select>
+            </label>
+          </div>
+          <label class="campo" data-entrega="provincia">DNI de quien recoge
+            <input name="dni" inputmode="numeric" maxlength="8" placeholder="8 dígitos">
+          </label>
+          <label class="campo">Forma de pago
+            <select name="pago" id="select-pago"></select>
+          </label>
+          <label class="campo">Notas (opcional)
+            <textarea name="notas" rows="2" placeholder="Ej: es para regalo, envolver por favor"></textarea>
+          </label>
+        </div>
+      </div>
+
+      <footer class="drawer__pie" id="drawer-pie">
+        <dl class="totales">
+          <div><dt>Subtotal</dt><dd id="t-subtotal"></dd></div>
+          <div id="fila-descuento" class="totales__descuento" hidden><dt id="t-descuento-label">Descuento</dt><dd id="t-descuento"></dd></div>
+          <div id="fila-envio"><dt>Envío</dt><dd id="t-envio"></dd></div>
+          <div class="totales__total"><dt>Total</dt><dd id="t-total"></dd></div>
+        </dl>
+        <button class="btn btn--wa btn--lg btn--bloque" type="submit" id="enviar"><i class="ph-fill ph-whatsapp-logo" aria-hidden="true"></i>Enviar pedido por WhatsApp</button>
+        <p class="drawer__nota"><i class="ph ph-lock-simple" aria-hidden="true"></i>No pagas aquí: confirmamos stock y te enviamos los datos de pago por WhatsApp.</p>
+      </footer>
+    </form>
+  </dialog>
+
+  <!-- ============ AVISO (toast) ============ -->
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+  <script src="https://unpkg.com/aos@2.3.4/dist/aos.js"></script>
+  <script src="js/config.js"></script>
+  <script src="js/main.js"></script>
+</body>
+</html>

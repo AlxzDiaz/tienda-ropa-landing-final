@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 800" width="600" height="800">
+  <rect width="600" height="800" fill="#EFE6DA"/>
+  <circle cx="300" cy="380" r="230" fill="#F8F3EC"/>
+  <path d="M220 190h160l20 400h-80l-20-280-20 280h-80Z" fill="#D9CBB8"/><path d="M220 220h160" stroke="#A9472A" stroke-width="10"/>
+  <text x="300" y="730" text-anchor="middle" font-family="Georgia, serif" font-style="italic" font-size="34" fill="#A9472A">Pantalones</text>
+</svg>

@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 800" width="600" height="800">
+  <rect width="600" height="800" fill="#EFE6DA"/>
+  <circle cx="300" cy="380" r="230" fill="#F8F3EC"/>
+  <path d="M250 200c20 26 80 26 100 0l90 40-30 80-40-18v228H230V302l-40 18-30-80Z" fill="#D9CBB8"/>
+  <text x="300" y="730" text-anchor="middle" font-family="Georgia, serif" font-style="italic" font-size="34" fill="#A9472A">Blusas</text>
+</svg>
