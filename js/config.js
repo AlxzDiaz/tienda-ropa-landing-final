@@ -26,6 +26,28 @@ const CONFIG = {
   // Probador virtual: combina una prenda de arriba con una de abajo (id de categorías)
   probador: { descuento: 10, arriba: ["blusas"], abajo: ["pantalones"] },
 
+  // Fotos de la portada: van cambiando solas con un zoom suave
+  portada: [
+    { imagen: foto("1767396858128-85b1262a7677", 1100, 1400), alt: "Mujer sonriente con vestido claro entre palmeras", pie: "Lino al atardecer" },
+    { imagen: foto("1777545151770-000221c89fde", 1100, 1400), alt: "Mujer con conjunto blanco entre hojas de monstera", pie: "Blanco que respira" },
+    { imagen: foto("1729287568453-b0f5bad73983", 1100, 1400), alt: "Mujer con sombrero y camisa estampada entre palmeras", pie: "Estampados de la selva" },
+  ],
+
+  // Estilista virtual de la portada: la clienta elige la ocasión y ve un outfit sugerido
+  ocasiones: [
+    { id: "trabajo", nombre: "Trabajo", icono: "ph-briefcase", texto: "Fresco y formal, para aguantar el calor de la oficina.",
+      prendas: [{ producto: "blusa-calada", color: "Blanco" }, { producto: "pantalon-lino", color: "Castaña" }, { producto: "mini-bolso", color: "Achiote" }] },
+    { id: "paseo", nombre: "Paseo", icono: "ph-sun", texto: "Color y tela fluida para caminar por el malecón.",
+      prendas: [{ producto: "blusa-palmeras", color: "Verde palma" }, { producto: "palazzo-tropical", color: "Hojas" }, { producto: "mini-bolso", color: "Mango" }] },
+    { id: "fiesta", nombre: "Fiesta", icono: "ph-champagne", texto: "Estampado de selva, brillo dorado y un toque de rojo.",
+      prendas: [{ producto: "maxi-floral", color: "Floral" }, { producto: "sandalias-tiras", color: "Dorado" }, { producto: "mini-bolso", color: "Achiote" }] },
+    { id: "finde", nombre: "Fin de semana", icono: "ph-tree-palm", texto: "Lino verde selva para la feria o el almuerzo familiar.",
+      prendas: [{ producto: "vestido-yute", color: "Selva" }, { producto: "sandalias-tiras", color: "Dorado" }, { producto: "mini-bolso", color: "Mango" }] },
+  ],
+
+  // Empaque de regalo opcional en la bolsa (costo en soles). null = sin opción de regalo.
+  regalo: { costo: 6 },
+
   direccion: "Jr. Loreto 245, frente a la Plaza de Armas",
   ciudad: "Puerto Maldonado",
   region: "Madre de Dios",

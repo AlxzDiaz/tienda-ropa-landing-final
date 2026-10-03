@@ -18,7 +18,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="preconnect" href="https://images.unsplash.com">
   <!-- La foto principal de la portada se pide primero (es lo más grande que ve el cliente al entrar) -->
-  <link rel="preload" as="image" href="https://images.unsplash.com/photo-1767396858128-85b1262a7677?auto=format&fit=crop&crop=faces&w=760&h=920&q=70" fetchpriority="high">
+  <link rel="preload" as="image" href="https://images.unsplash.com/photo-1767396858128-85b1262a7677?auto=format&fit=crop&w=1100&h=1400&q=70" fetchpriority="high">
   <link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,500;0,6..96,600;0,6..96,700;1,6..96,500;1,6..96,600&family=Manrope:wght@400;500;700;800&display=swap" rel="stylesheet">
 
   <!-- Librerías: Phosphor Icons (íconos) + AOS (animaciones al hacer scroll) -->
@@ -76,43 +76,48 @@
   </header>
 
   <main>
-    <!-- ============ HERO ============ -->
-    <section class="hero" id="inicio">
-      <div class="container hero__grid">
-        <div class="hero__texto">
-          <a class="rating" id="rating" href="#opiniones"></a>
-          <h1 data-aos="fade-up">Ropa <em>fresca</em> para el calor de la selva</h1>
-          <p class="hero__sub" data-aos="fade-up" data-aos-delay="100">Vestidos de lino, blusas con estampados tropicales y pantalones que respiran. Elige tu talla, arma tu bolsa y confírmala por WhatsApp.</p>
-          <div class="hero__acciones" data-aos="fade-up" data-aos-delay="200">
-            <a class="btn btn--primario btn--lg" href="#coleccion"><i class="ph ph-coat-hanger" aria-hidden="true"></i>Ver la colección</a>
-            <a class="btn btn--borde btn--lg" href="#looks"><i class="ph ph-sparkle" aria-hidden="true"></i>Looks armados</a>
+    <!-- ============ PORTADA BOUTIQUE ============ -->
+    <section class="hb" id="inicio">
+      <div class="hb__panel">
+        <div class="hb__arriba">
+          <p class="hb__saludo" id="saludo"></p>
+          <a class="rating rating--oscuro" id="rating" href="#opiniones"></a>
+        </div>
+        <h1 data-aos="fade-up">Ropa <em>fresca</em> para el calor de la selva</h1>
+        <p class="hb__sub" data-aos="fade-up" data-aos-delay="80">Lino y estampados tropicales que se mueven contigo. Dinos la ocasión y te armamos el look.</p>
+
+        <!-- Estilista virtual: la clienta elige la ocasión y ve un outfit sugerido -->
+        <div class="estilista" data-aos="fade-up" data-aos-delay="160">
+          <div class="estilista__cabeza">
+            <span><i class="ph-fill ph-magic-wand" aria-hidden="true"></i> Estilista virtual</span>
+            <small>¿Para qué ocasión?</small>
           </div>
-          <ul class="hero__trust" data-aos="fade-up" data-aos-delay="300">
-            <li class="estado" id="estado"></li>
-            <li><i class="ph ph-truck" aria-hidden="true"></i>Envíos a todo el Perú</li>
-            <li><i class="ph ph-arrows-clockwise" aria-hidden="true"></i><span>Cambios en <span id="cambios-dias"></span> días</span></li>
-          </ul>
+          <div class="estilista__chips" id="ocasiones" role="radiogroup" aria-label="Ocasión"></div>
+          <p class="estilista__texto" id="ocasion-texto" aria-live="polite"></p>
+          <div class="estilista__prendas" id="ocasion-prendas"></div>
+          <div class="estilista__pie">
+            <span class="estilista__total" id="ocasion-total"></span>
+            <a class="estilista__wa" id="ocasion-wa" href="#" target="_blank" rel="noopener"><i class="ph-fill ph-whatsapp-logo" aria-hidden="true"></i>Pedir este look</a>
+          </div>
         </div>
 
-        <div class="hero__visual" data-aos="zoom-in" data-aos-delay="150">
-          <!-- Fotos de portada: cámbialas por fotos reales de la colección del cliente -->
-          <figure class="hero__foto hero__foto--principal">
-            <img src="https://images.unsplash.com/photo-1767396858128-85b1262a7677?auto=format&fit=crop&crop=faces&w=760&h=920&q=70"
-                 data-fallback="images/ropa/vestidos.svg" alt="Mujer sonriente con vestido claro entre palmeras" width="560" height="680" fetchpriority="high">
-          </figure>
-          <figure class="hero__foto hero__foto--mini">
-            <img src="https://images.unsplash.com/photo-1566446687891-0bad218d0cbe?auto=format&fit=crop&w=420&h=520&q=70"
-                 data-fallback="images/ropa/vestidos.svg" alt="Mujer con vestido blanco caminando por un sendero tropical" width="210" height="260">
-          </figure>
-          <!-- Sello circular que gira -->
-          <svg class="sello-giro" viewBox="0 0 120 120" aria-hidden="true">
-            <defs><path id="circulo" d="M60,60 m-44,0 a44,44 0 1,1 88,0 a44,44 0 1,1 -88,0"/></defs>
-            <text><textPath href="#circulo">Nueva colección · Primavera 2026 ·</textPath></text>
-          </svg>
-          <!-- Tarjeta de la prenda destacada (se llena desde config.js) -->
-          <button class="flotante flotante--producto" type="button" id="portada-destacado" hidden></button>
-          <span class="chip-flotante"><i class="ph-fill ph-leaf" aria-hidden="true"></i>Lino que respira</span>
-        </div>
+        <ul class="hero__trust hb__trust">
+          <li class="estado" id="estado"></li>
+          <li><i class="ph ph-truck" aria-hidden="true"></i>Envíos a todo el Perú</li>
+          <li><i class="ph ph-arrows-clockwise" aria-hidden="true"></i><span>Cambios en <span id="cambios-dias"></span> días</span></li>
+        </ul>
+      </div>
+
+      <div class="hb__media">
+        <!-- Fotos de portada (config.js → portada): cámbialas por fotos reales del cliente -->
+        <div class="hb__slides" id="hb-slides"></div>
+        <p class="hb__pie" aria-hidden="true"><span id="hb-num">01</span><span class="hb__barra"><span id="hb-progreso"></span></span><span id="hb-texto"></span></p>
+        <svg class="sello-giro" viewBox="0 0 120 120" aria-hidden="true">
+          <defs><path id="circulo" d="M60,60 m-44,0 a44,44 0 1,1 88,0 a44,44 0 1,1 -88,0"/></defs>
+          <text><textPath href="#circulo">Nueva colección · Primavera 2026 ·</textPath></text>
+        </svg>
+        <!-- Tarjeta de la prenda destacada (se llena desde config.js) -->
+        <button class="flotante flotante--producto" type="button" id="portada-destacado" hidden></button>
       </div>
     </section>
 
@@ -165,12 +170,18 @@
           <span class="eyebrow">Colección Primavera 2026</span>
           <h2>Elige tu prenda, tu color y <em>tu talla</em></h2>
           <p>Toca una prenda para ver sus colores y tallas disponibles. Guarda tus favoritas con el <i class="ph-fill ph-heart" aria-label="corazón"></i>.</p>
+          <button class="btn-talla" type="button" data-abrir-talla><i class="ph ph-ruler" aria-hidden="true"></i><span id="mi-talla-txt">Encuentra tu talla en 30 segundos</span></button>
         </header>
 
         <div class="barra-filtros">
           <div class="filtros" id="filtros" role="group" aria-label="Filtrar por categoría"></div>
         </div>
         <div class="orden">
+          <label class="buscador">
+            <i class="ph ph-magnifying-glass" aria-hidden="true"></i>
+            <span class="sr-only">Buscar prendas</span>
+            <input type="search" id="buscar" placeholder="Buscar: lino, vestido, mango…" autocomplete="off">
+          </label>
           <span class="orden__n" id="conteo" aria-live="polite"></span>
           <label class="orden__sel">
             <span class="sr-only">Ordenar por</span>
@@ -445,12 +456,40 @@
           <button class="link-btn" type="button" id="pv-compartir"><i class="ph ph-share-network" aria-hidden="true"></i><span>Compartir</span></button>
         </div>
 
+        <div class="completa" id="pv-completa">
+          <p class="pv__label">Completa el look</p>
+          <div class="completa__lista" id="pv-completa-lista"></div>
+        </div>
+
         <details class="pv__detalle">
           <summary>Material y cuidado</summary>
           <p id="pv-material"></p>
         </details>
       </div>
     </div>
+  </dialog>
+
+  <!-- ============ ENCUENTRA TU TALLA ============ -->
+  <dialog class="modal modal--chico" id="modal-talla" aria-labelledby="talla-titulo">
+    <form class="modal__panel guia" id="form-talla" novalidate>
+      <button class="modal__cerrar" type="button" data-cerrar aria-label="Cerrar"><i class="ph ph-x" aria-hidden="true"></i></button>
+      <h2 id="talla-titulo">Encuentra <em>tu talla</em></h2>
+      <p>Mídete con una cinta métrica sobre la ropa interior. Guardamos tu talla para marcarla en cada prenda.</p>
+      <div class="medidas">
+        <label class="campo">Busto (cm)<input name="busto" type="number" inputmode="numeric" min="60" max="140" placeholder="Ej: 90"></label>
+        <label class="campo">Cintura (cm)<input name="cintura" type="number" inputmode="numeric" min="50" max="130" placeholder="Ej: 72"></label>
+        <label class="campo">Cadera (cm)<input name="cadera" type="number" inputmode="numeric" min="70" max="150" placeholder="Ej: 98"></label>
+      </div>
+      <fieldset class="entrega entrega--ajuste">
+        <legend>¿Cómo te gusta que te quede?</legend>
+        <label><input type="radio" name="ajuste" value="ajustado"><span>Ajustado</span></label>
+        <label><input type="radio" name="ajuste" value="normal" checked><span>Normal</span></label>
+        <label><input type="radio" name="ajuste" value="holgado"><span>Holgado</span></label>
+      </fieldset>
+      <p class="talla-resultado" id="talla-resultado" aria-live="polite"></p>
+      <button class="btn btn--primario btn--lg btn--bloque" type="submit"><i class="ph ph-sparkle" aria-hidden="true"></i>Calcular mi talla</button>
+      <button class="link-btn talla-borrar" type="button" id="talla-borrar" hidden>Borrar mi talla guardada</button>
+    </form>
   </dialog>
 
   <!-- ============ GUÍA DE TALLAS ============ -->
@@ -524,6 +563,12 @@
           <label class="campo">Forma de pago
             <select name="pago" id="select-pago"></select>
           </label>
+          <div class="regalo" id="regalo-bloque">
+            <label class="regalo__check"><input type="checkbox" name="regalo" id="regalo-check"><span><i class="ph ph-gift" aria-hidden="true"></i>Empaque de regalo <small id="regalo-costo"></small></span></label>
+            <label class="campo" id="regalo-campo" hidden>Dedicatoria para la tarjeta
+              <textarea name="dedicatoria" rows="2" maxlength="160" placeholder="Ej: ¡Feliz cumpleaños, mamá!"></textarea>
+            </label>
+          </div>
           <label class="campo">Notas (opcional)
             <textarea name="notas" rows="2" placeholder="Ej: es para regalo, envolver por favor"></textarea>
           </label>
@@ -535,6 +580,7 @@
           <div><dt>Subtotal</dt><dd id="t-subtotal"></dd></div>
           <div id="fila-descuento" class="totales__descuento" hidden><dt id="t-descuento-label">Descuento</dt><dd id="t-descuento"></dd></div>
           <div id="fila-envio"><dt>Envío</dt><dd id="t-envio"></dd></div>
+          <div id="fila-regalo" hidden><dt>Empaque de regalo</dt><dd id="t-regalo"></dd></div>
           <div class="totales__total"><dt>Total</dt><dd id="t-total"></dd></div>
         </dl>
         <button class="btn btn--wa btn--lg btn--bloque" type="submit" id="enviar"><i class="ph-fill ph-whatsapp-logo" aria-hidden="true"></i>Enviar pedido por WhatsApp</button>

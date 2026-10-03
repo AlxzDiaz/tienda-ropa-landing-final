@@ -31,6 +31,12 @@ tienda-ropa-landing-boutique/
 | Combo del día | **Oferta con cuenta regresiva** que se oculta sola al terminar |
 | — | **Looks armados**: 3 prendas juntas con descuento; se elige la talla de cada una |
 | — | **Probador virtual**: un espejo en forma de arco donde combinas una blusa con un pantalón (flechas o deslizando el dedo), botón "Sorpréndeme" y outfit con 10% de descuento |
+| — | **Portada premium a dos paneles**: saludo según la hora de Puerto Maldonado, fotos que cambian solas con zoom suave y barra de progreso (`portada` en config) |
+| — | **Estilista virtual**: la clienta elige la ocasión (trabajo, paseo, fiesta, fin de semana) y ve un outfit sugerido con su precio y botón para pedirlo por WhatsApp (`ocasiones` en config) |
+| — | **Encuentra tu talla**: calculadora con busto, cintura y cadera; guarda la talla, la marca en cada tarjeta ("Tu talla M disponible") y la deja preseleccionada en cada prenda |
+| — | **Completa el look** dentro de cada prenda: 3 sugerencias que combinan |
+| — | **Lupa** sobre la foto de la prenda y **buscador** en la colección (ignora tildes) |
+| — | **Empaque de regalo** con dedicatoria; se suma al total y llega en el mensaje (`regalo` en config) |
 | — | **Tarjeta de la prenda destacada** en la portada: se toca y abre la prenda (`destacadoPortada` en config) |
 | — | **Cupón de descuento** (no se suma a ofertas ni a looks) |
 | Delivery o recojo | Delivery local, **envío a provincia** (ciudad, agencia y DNI) o recojo en tienda |

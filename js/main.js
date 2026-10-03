@@ -135,6 +135,10 @@
 
   function pintarHorarios() {
     const { dia, minutos } = ahoraEnLima();
+    // Saludo de la portada según la hora de Puerto Maldonado
+    const h = Math.floor(minutos / 60);
+    const saludo = $("#saludo");
+    if (saludo) saludo.innerHTML = `<span class="hb__punto" aria-hidden="true"></span>${h < 12 ? "Buenos días" : h < 19 ? "Buenas tardes" : "Buenas noches"} · ${esc(CONFIG.ciudad)} · ${formatoHora(`${h}:${String(minutos % 60).padStart(2, "0")}`)}`;
     const hoy = horarioDe(dia);
     const filas = CONFIG.horarios.map((h) => ({ h, rango: `${formatoHora(h.abre)} – ${formatoHora(h.cierra)}` }));
 
@@ -170,6 +174,10 @@
   const escribir = (k, v) => { try { localStorage.setItem(`${CLAVE}-${k}`, JSON.stringify(v)); } catch (_) { /* almacenamiento no disponible */ } };
 
   const favs = new Set(leer("favs", []).filter((id) => PRODUCTOS.has(id)));
+  // Talla que calculó la clienta en "Encuentra tu talla" (se marca en cada prenda)
+  const TALLAS_GUIA = CONFIG.guiaTallas.filas.map((f) => f[0]);
+  let miTalla = TALLAS_GUIA.includes(leer("talla", null)) ? leer("talla", null) : null;
+  let actualizarEstilista = null;
   let cuponAplicado = CONFIG.cupon && leer("cupon", null) === CONFIG.cupon.codigo ? CONFIG.cupon.codigo : null;
 
   /* Cada artículo de la bolsa es:
@@ -324,6 +332,7 @@
         <div class="swatches" role="group" aria-label="Colores de ${esc(p.nombre)}">
           ${p.colores.map((c, ci) => `<button type="button" class="swatch" style="--c:${c.hex}" data-color-tarjeta="${ci}" aria-pressed="${ci === 0}" aria-label="${esc(c.nombre)}" title="${esc(c.nombre)}"></button>`).join("")}
         </div>
+        <span class="mi-talla" data-mi-talla hidden></span>
         <h3 class="producto__nombre">${esc(p.nombre)}</h3>
         ${precioHTML(p)}
         <button class="btn btn--add" type="button" data-abrir="${p.id}"><i class="ph ph-ruler" aria-hidden="true"></i>Elegir talla</button>
@@ -343,13 +352,21 @@
     $(".producto__fotos", li).innerHTML = fotosTarjeta(p, p.colores[ci]);
   });
 
+  // Buscador: ignora mayúsculas y tildes ("limon" encuentra "Limón")
+  const normalizar = (t) => String(t || "").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").trim();
+  const indiceBusqueda = new Map(CONFIG.productos.map((p) => [p.id, normalizar(
+    [p.nombre, p.descripcion, p.material, CATEGORIAS.get(p.categoria)?.nombre, ...p.colores.map((c) => c.nombre)].join(" "))]));
+  const coincide = (p, texto) => !texto || texto.split(/\s+/).every((w) => indiceBusqueda.get(p.id).includes(w));
+
   function aplicarFiltro() {
     const orden = $("#orden").value;
-    const lista = CONFIG.productos.filter((p) =>
+    const busqueda = $("#buscar").value.trim();
+    const texto = normalizar(busqueda);
+    const lista = CONFIG.productos.filter((p) => (
       filtro === "todos" ? true
         : filtro === "ofertas" ? Boolean(p.precioAntes)
           : filtro === "favoritos" ? favs.has(p.id)
-            : p.categoria === filtro);
+            : p.categoria === filtro) && coincide(p, texto));
     const ordenada = [...lista];
     if (orden === "menor") ordenada.sort((a, b) => a.precio - b.precio);
     if (orden === "mayor") ordenada.sort((a, b) => b.precio - a.precio);
@@ -363,7 +380,24 @@
     });
     $("#conteo").textContent = `${lista.length} ${lista.length === 1 ? "prenda" : "prendas"}`;
     $("#sin-resultados").hidden = lista.length > 0;
+    $("#sin-resultados p").textContent = texto
+      ? `No encontramos prendas con “${busqueda}”. Prueba con otra palabra o escríbenos.`
+      : "Todavía no tienes favoritos. Toca el corazón de una prenda para guardarla aquí.";
     if (window.AOS) AOS.refresh();
+  }
+
+  // Marca en cada tarjeta si la talla de la clienta está disponible
+  function pintarMiTalla() {
+    $$(".producto", grid).forEach((li) => {
+      const n = miTalla ? PRODUCTOS.get(li.dataset.id).tallas[miTalla] : undefined;
+      const aviso = $("[data-mi-talla]", li);
+      aviso.hidden = n === undefined;
+      if (n === undefined) return;
+      aviso.classList.toggle("mi-talla--agotada", n === 0);
+      aviso.innerHTML = n > 0 ? `<i class="ph-fill ph-check-circle" aria-hidden="true"></i>Tu talla ${miTalla} disponible` : `Tu talla ${miTalla} agotada`;
+    });
+    $("#mi-talla-txt").textContent = miTalla ? `Tu talla: ${miTalla} · volver a calcular` : "Encuentra tu talla en 30 segundos";
+    if (actualizarEstilista) actualizarEstilista();
   }
 
   function elegirFiltro(id, desplazar) {
@@ -376,11 +410,73 @@
   }
   filtros.addEventListener("click", (e) => { const b = e.target.closest(".chip"); if (b) elegirFiltro(b.dataset.filtroChip, false); });
   $("#orden").addEventListener("change", aplicarFiltro);
+  $("#buscar").addEventListener("input", aplicarFiltro);
   document.addEventListener("click", (e) => { const b = e.target.closest("[data-filtro]"); if (b) elegirFiltro(b.dataset.filtro, true); });
   $("#favs-btn").addEventListener("click", () => {
     elegirFiltro("favoritos", true);
     if (!favs.size) avisar("Toca el corazón de una prenda para guardarla", "ph-heart");
   });
+
+  /* ---------- 5b. Portada boutique: fotos que cambian y estilista virtual ---------- */
+  const slides = CONFIG.portada || [];
+  const contSlides = $("#hb-slides");
+  contSlides.innerHTML = slides.map((sl, i) =>
+    `<img class="hb__slide${i === 0 ? " activa" : ""}" src="${esc(sl.imagen)}" alt="" ${i === 0 ? 'fetchpriority="high"' : 'loading="lazy"'} decoding="async" data-fallback="images/ropa/vestidos.svg">`).join("");
+  let slideActual = 0;
+  function mostrarSlide(i) {
+    const imgs = $$(".hb__slide", contSlides);
+    if (!imgs.length) return;
+    slideActual = (i + imgs.length) % imgs.length;
+    imgs.forEach((img, k) => {
+      img.classList.toggle("activa", k === slideActual);
+      img.alt = k === slideActual ? slides[k].alt : "";
+    });
+    $("#hb-num").textContent = String(slideActual + 1).padStart(2, "0");
+    $("#hb-texto").textContent = slides[slideActual].pie || "";
+    const barra = $("#hb-progreso");
+    barra.classList.remove("corre"); void barra.offsetWidth; barra.classList.add("corre");
+  }
+  mostrarSlide(0);
+  if (slides.length > 1 && !reduceMotion) setInterval(() => mostrarSlide(slideActual + 1), 6000);
+
+  const ocasiones = CONFIG.ocasiones || [];
+  if (!ocasiones.length) $(".estilista").remove();
+  else {
+    $("#ocasiones").innerHTML = ocasiones.map((o, i) =>
+      `<button type="button" role="radio" class="ocasion" data-ocasion="${o.id}" aria-checked="${i === 0}" tabindex="${i === 0 ? 0 : -1}"><i class="ph ${o.icono}" aria-hidden="true"></i>${esc(o.nombre)}</button>`).join("");
+    const pintarOcasion = (id) => {
+      const o = ocasiones.find((x) => x.id === id) || ocasiones[0];
+      $$(".ocasion").forEach((b) => {
+        const activa = b.dataset.ocasion === o.id;
+        b.setAttribute("aria-checked", String(activa));
+        b.tabIndex = activa ? 0 : -1;
+      });
+      const prendas = o.prendas.map((pz) => ({ ...pz, p: PRODUCTOS.get(pz.producto) })).filter((x) => x.p);
+      $("#ocasion-texto").textContent = o.texto;
+      $("#ocasion-prendas").innerHTML = prendas.map(({ p, color }, i) => {
+        const ci = Math.max(0, p.colores.findIndex((c) => c.nombre === color));
+        return `<button type="button" class="estilista__prenda" data-abrir="${p.id}" data-color-idx="${ci}" style="--retraso:${i * 70}ms" aria-label="Ver ${esc(p.nombre)} color ${esc(p.colores[ci].nombre)}">
+          <img src="${esc(p.colores[ci].imagenes[0].replace(/w=\d+&h=\d+/, "w=240&h=320"))}" alt="" width="120" height="160">
+          <span>${esc(p.nombre)}</span><strong>${soles(p.precio)}</strong></button>`;
+      }).join("");
+      const total = prendas.reduce((t, x) => t + x.p.precio, 0);
+      $("#ocasion-total").innerHTML = `Look completo <strong>${soles(total)}</strong>`;
+      const lista = prendas.map(({ p, color }) => `${p.nombre} (${color})`).join(", ");
+      $("#ocasion-wa").href = waLink(`Hola ${CONFIG.nombre}, me interesa el look para ${o.nombre.toLowerCase()}: ${lista}.${miTalla ? ` Mi talla es ${miTalla}.` : ""} ¿Me ayudan con las tallas?`);
+    };
+    $("#ocasiones").addEventListener("click", (e) => { const b = e.target.closest("[data-ocasion]"); if (b) pintarOcasion(b.dataset.ocasion); });
+    $("#ocasiones").addEventListener("keydown", (e) => {
+      if (!["ArrowRight", "ArrowLeft", "ArrowDown", "ArrowUp"].includes(e.key)) return;
+      const lista = $$(".ocasion");
+      const paso = e.key === "ArrowRight" || e.key === "ArrowDown" ? 1 : -1;
+      const sig = lista[(lista.indexOf(document.activeElement) + paso + lista.length) % lista.length];
+      e.preventDefault();
+      pintarOcasion(sig.dataset.ocasion);
+      sig.focus();
+    });
+    actualizarEstilista = () => pintarOcasion($('.ocasion[aria-checked="true"]').dataset.ocasion);
+    pintarOcasion(ocasiones[0].id);
+  }
 
   /* ---------- 6. Oferta con cuenta regresiva ---------- */
   const promo = CONFIG.promo;
@@ -431,6 +527,7 @@
     if (!p) return;
     const tallasDisponibles = Object.keys(p.tallas).filter((t) => p.tallas[t] > 0);
     Object.assign(pv, { p, color, talla: tallasDisponibles.length === 1 && Object.keys(p.tallas).length === 1 ? tallasDisponibles[0] : null, cantidad: 1, foto: 0 });
+    if (!pv.talla && miTalla && p.tallas[miTalla] > 0) pv.talla = miTalla;   // preselecciona la talla calculada
 
     $("#pv-cat").textContent = CATEGORIAS.get(p.categoria)?.nombre || "";
     $("#pv-nombre").textContent = p.nombre;
@@ -451,13 +548,36 @@
 
     const unaSola = Object.keys(p.tallas).length === 1;
     $("#pv-tallas").innerHTML = Object.entries(p.tallas).map(([t, n]) => `
-      <button type="button" class="talla" role="radio" data-talla="${esc(t)}" aria-checked="false" ${n === 0 ? "disabled" : ""}
-        aria-label="${esc(t)}${n === 0 ? ", agotada" : n <= 2 ? `, quedan ${n}` : ""}">${esc(t)}${n > 0 && n <= 2 && !unaSola ? `<span class="talla__pocas">Quedan ${n}</span>` : ""}</button>`).join("");
+      <button type="button" class="talla${t === miTalla ? " talla--tuya" : ""}" role="radio" data-talla="${esc(t)}" aria-checked="false" ${n === 0 ? "disabled" : ""}
+        aria-label="${esc(t)}${t === miTalla ? ", tu talla" : ""}${n === 0 ? ", agotada" : n <= 2 ? `, quedan ${n}` : ""}">${esc(t)}${n > 0 && n <= 2 && !unaSola ? `<span class="talla__pocas">Quedan ${n}</span>` : ""}</button>`).join("");
     $("#pv-guia").hidden = p.categoria === "accesorios";
+    pintarCompleta(p);
 
     pintarVista();
     if (!modalPrenda.open) modalPrenda.showModal();
     modalPrenda.querySelector(".modal__panel").scrollTop = 0;
+  }
+
+  // "Completa el look": primero las prendas que comparten look u ocasión, luego categorías que combinan
+  const COMPLEMENTO = { blusas: ["pantalones"], pantalones: ["blusas"], vestidos: ["accesorios"], conjuntos: ["accesorios"], accesorios: ["vestidos", "blusas"] };
+  function pintarCompleta(p) {
+    const vistos = new Set([p.id]);
+    const lista = [];
+    const sumar = (id, color) => {
+      const q = PRODUCTOS.get(id);
+      if (!q || vistos.has(id) || stockTotal(q) === 0) return;
+      vistos.add(id);
+      lista.push({ q, ci: Math.max(0, q.colores.findIndex((c) => c.nombre === color)) });
+    };
+    [...CONFIG.looks.map((l) => l.piezas), ...(CONFIG.ocasiones || []).map((o) => o.prendas)]
+      .filter((piezas) => piezas.some((pz) => pz.producto === p.id))
+      .forEach((piezas) => piezas.forEach((pz) => sumar(pz.producto, pz.color)));
+    CONFIG.productos.filter((q) => (COMPLEMENTO[p.categoria] || []).includes(q.categoria)).forEach((q) => sumar(q.id));
+    const tres = lista.slice(0, 3);
+    $("#pv-completa").hidden = !tres.length;
+    $("#pv-completa-lista").innerHTML = tres.map(({ q, ci }) => `<button type="button" class="completa__item" data-abrir="${q.id}" data-color-idx="${ci}">
+      <img src="${esc(q.colores[ci].imagenes[0].replace(/w=\d+&h=\d+/, "w=240&h=320"))}" alt="" width="120" height="160">
+      <span>${esc(q.nombre)}</span><strong>${soles(q.precio)}</strong></button>`).join("");
   }
 
   function pintarVista() {
@@ -546,7 +666,7 @@
     const b = e.target.closest("[data-abrir]");
     if (!b) return;
     const li = b.closest(".producto");
-    abrirPrenda(b.dataset.abrir, li ? Number(li.dataset.color) : 0);
+    abrirPrenda(b.dataset.abrir, li ? Number(li.dataset.color) : Number(b.dataset.colorIdx || 0));
   });
   document.addEventListener("click", (e) => {
     const b = e.target.closest("[data-fav]");
@@ -558,6 +678,65 @@
   $("#tabla-tallas").innerHTML = `<thead><tr>${g.columnas.map((c) => `<th scope="col">${esc(c)}</th>`).join("")}</tr></thead>
     <tbody>${g.filas.map(([t, ...m]) => `<tr><th scope="row">${esc(t)}</th>${m.map((v) => `<td>${esc(v)}</td>`).join("")}</tr>`).join("")}</tbody>`;
   $("#guia-consejo").innerHTML = `<i class="ph ph-lightbulb" aria-hidden="true"></i><span>${esc(g.consejo)}</span>`;
+
+  // Lupa sobre la foto de la prenda (solo con mouse)
+  if (window.matchMedia("(hover: hover) and (pointer: fine)").matches && !reduceMotion) {
+    const marco = $(".pv__principal");
+    marco.addEventListener("mousemove", (e) => {
+      const r = marco.getBoundingClientRect();
+      $("#pv-img").style.transformOrigin = `${((e.clientX - r.left) / r.width) * 100}% ${((e.clientY - r.top) / r.height) * 100}%`;
+    });
+    marco.addEventListener("mouseenter", () => marco.classList.add("zoom"));
+    marco.addEventListener("mouseleave", () => marco.classList.remove("zoom"));
+  }
+
+  /* ---------- 7b. Encuentra tu talla ---------- */
+  const modalTalla = $("#modal-talla");
+  const formTalla = $("#form-talla");
+  const resultadoTalla = $("#talla-resultado");
+  const columna = (nombre) => CONFIG.guiaTallas.columnas.findIndex((c) => normalizar(c) === nombre);
+  // Para cada medida busca la primera talla cuyo rango la cubre y se queda con la mayor
+  function calcularTalla(medidas, ajuste) {
+    let fuera = false;
+    const indices = Object.entries(medidas).filter(([, v]) => v > 0).map(([k, v]) => {
+      const col = columna(k);
+      const i = CONFIG.guiaTallas.filas.findIndex((f) => v <= Number(String(f[col]).split(/[–-]/).pop()));
+      if (i === -1) fuera = true;
+      return i === -1 ? TALLAS_GUIA.length - 1 : i;
+    });
+    if (!indices.length) return null;
+    let i = Math.max(...indices);
+    if (ajuste === "ajustado" && Math.min(...indices) < i) i -= 1;
+    if (ajuste === "holgado") i += 1;
+    return { talla: TALLAS_GUIA[Math.min(i, TALLAS_GUIA.length - 1)], fuera };
+  }
+  formTalla.addEventListener("submit", (e) => {
+    e.preventDefault();
+    const medidas = Object.fromEntries(["busto", "cintura", "cadera"].map((k) => [k, Number(formTalla[k].value) || 0]));
+    const r = calcularTalla(medidas, formTalla.ajuste.value);
+    if (!r) { resultadoTalla.className = "talla-resultado error"; resultadoTalla.textContent = "Escribe al menos una medida."; return; }
+    miTalla = r.talla;
+    escribir("talla", miTalla);
+    resultadoTalla.className = "talla-resultado ok";
+    resultadoTalla.innerHTML = `Tu talla recomendada es <strong>${miTalla}</strong>. Ya la marcamos en cada prenda.${r.fuera ? " Tus medidas pasan nuestra guía: escríbenos y te ayudamos a elegir." : ""}`;
+    $("#talla-borrar").hidden = false;
+    pintarMiTalla();
+  });
+  $("#talla-borrar").addEventListener("click", () => {
+    miTalla = null;
+    escribir("talla", null);
+    resultadoTalla.className = "talla-resultado";
+    resultadoTalla.textContent = "Listo, borramos tu talla guardada.";
+    $("#talla-borrar").hidden = true;
+    pintarMiTalla();
+  });
+  document.addEventListener("click", (e) => {
+    if (!e.target.closest("[data-abrir-talla]")) return;
+    resultadoTalla.className = "talla-resultado";
+    resultadoTalla.innerHTML = miTalla ? `Tu talla guardada es <strong>${miTalla}</strong>.` : "";
+    $("#talla-borrar").hidden = !miTalla;
+    modalTalla.showModal();
+  });
 
   /* ---------- 8. Selector de talla compartido (looks y probador) ---------- */
   function selectorTalla(p) {
@@ -704,6 +883,8 @@
   /* ---------- 11. Bolsa, envío, cupón y pedido por WhatsApp ---------- */
   const drawer = $("#drawer");
   const form = $("#form-pedido");
+  if (!CONFIG.regalo) $("#regalo-bloque").remove();
+  else $("#regalo-costo").textContent = `(+${soles(CONFIG.regalo.costo)})`;
 
   function calcular() {
     let items = 0, subtotal = 0, baseCupon = 0;
@@ -718,11 +899,12 @@
     const descuento = cuponAplicado ? redondear(baseCupon * CONFIG.cupon.porcentaje / 100) : 0;
     const regla = CONFIG.envios[entrega];
     const envio = regla && subtotal > 0 && subtotal < regla.gratisDesde ? regla.costo : 0;
-    return { items, subtotal, descuento, envio, total: redondear(subtotal - descuento + envio), entrega, regla };
+    const regalo = CONFIG.regalo && form.regalo?.checked && items > 0 ? CONFIG.regalo.costo : 0;
+    return { items, subtotal, descuento, envio, regalo, total: redondear(subtotal - descuento + envio + regalo), entrega, regla };
   }
 
   function actualizarBolsa() {
-    const { items, subtotal, descuento, envio, total, entrega, regla } = calcular();
+    const { items, subtotal, descuento, envio, regalo, total, entrega, regla } = calcular();
 
     // Header + barra
     $("#bolsa-n").hidden = items === 0;
@@ -770,6 +952,9 @@
     if (cuponAplicado) $("#t-descuento-label").textContent = `Cupón ${cuponAplicado} (-${CONFIG.cupon.porcentaje}%)`;
     $("#t-descuento").textContent = "-" + soles(descuento);
     $("#fila-envio").hidden = entrega === "recojo";
+    $("#fila-regalo").hidden = !regalo;
+    $("#t-regalo").textContent = soles(regalo);
+    if (form.regalo) $("#regalo-campo").hidden = !form.regalo.checked;
     $("#t-envio").textContent = envio ? soles(envio) : "Gratis";
     $("#t-total").textContent = soles(total);
   }
@@ -820,7 +1005,7 @@
   $("#barra").addEventListener("click", abrirBolsa);
   $("#bolsa-btn").addEventListener("click", abrirBolsa);
   $("#vacio-ver").addEventListener("click", () => { drawer.close(); $("#coleccion").scrollIntoView({ behavior: reduceMotion ? "auto" : "smooth" }); });
-  form.addEventListener("change", (e) => { if (e.target.name === "entrega") actualizarBolsa(); });
+  form.addEventListener("change", (e) => { if (["entrega", "regalo"].includes(e.target.name)) actualizarBolsa(); });
 
   // Cerrar cualquier modal con su botón o tocando fuera del panel
   $$("dialog").forEach((d) => d.addEventListener("click", (e) => { if (e.target === d) d.close(); }));
@@ -828,7 +1013,7 @@
 
   form.addEventListener("submit", (e) => {
     e.preventDefault();
-    const { subtotal, descuento, envio, total, entrega } = calcular();
+    const { subtotal, descuento, envio, regalo, total, entrega } = calcular();
     const v = (campo) => form[campo].value.trim();
 
     // Validación mínima según la forma de entrega
@@ -856,6 +1041,7 @@
       `Subtotal: ${solesExacto(subtotal)}`,
       descuento ? `Cupón ${cuponAplicado} (-${CONFIG.cupon.porcentaje}%): -${solesExacto(descuento)}` : null,
       entrega !== "recojo" ? `Envío: ${envio ? solesExacto(envio) : "Gratis"}` : null,
+      regalo ? `Empaque de regalo: ${solesExacto(regalo)}` : null,
       `*Total: ${solesExacto(total)}*`,
       "",
       `👤 Nombre: ${v("nombre")}`,
@@ -864,6 +1050,7 @@
       entrega === "provincia" ? `📍 Destino: ${v("ciudad")}` : null,
       entrega === "provincia" ? `🪪 DNI: ${v("dni")}` : null,
       `💳 Pago: ${form.pago.value}`,
+      regalo ? `🎁 Para regalo${v("dedicatoria") ? ` — Dedicatoria: "${v("dedicatoria")}"` : ""}` : null,
       v("notas") ? `📝 Notas: ${v("notas")}` : null,
     ].filter((l) => l !== null).join("\n");
 
@@ -980,6 +1167,7 @@
   /* ---------- 18. Inicio ---------- */
   actualizarFavs();
   aplicarFiltro();
+  pintarMiTalla();
   actualizarBolsa();
   if (window.AOS) AOS.init({ once: true, duration: 700, easing: "ease-out-cubic", offset: 40, disable: reduceMotion });
   // Enlace directo a una prenda: index.html#prenda-pantalon-lino
