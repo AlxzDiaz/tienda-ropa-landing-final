@@ -1,11 +1,13 @@
-# Landing de tienda de ropa · plantilla
+# Landing de tienda de ropa · versión boutique
+
+> Esta es la versión elaborada del demo. La versión simple está en el repositorio [tienda-ropa-landing](https://github.com/AlxzDiaz/tienda-ropa-landing).
 
 Página para tiendas de ropa y boutiques que venden por WhatsApp desde el celular. Es la evolución de la landing del restaurante ([GUIA-LANDINGS.md](../restaurante-landing/GUIA-LANDINGS.md)), adaptada al rubro de moda.
 
 Usa HTML, CSS y JavaScript, sin build. Solo hay que subir la carpeta.
 
 ```
-tienda-ropa-landing/
+tienda-ropa-landing-boutique/
 ├── index.html          estructura + SEO + fotos de portada y de "Nosotros"
 ├── css/styles.css      estilos (paleta en :root, arriba del archivo)
 ├── js/config.js        ← DATOS DE LA TIENDA: casi todo se cambia aquí
