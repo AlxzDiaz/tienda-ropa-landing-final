@@ -91,6 +91,18 @@
   const cinta = CONFIG.cinta.map((t) => `${esc(t)} <i class="ph-fill ph-asterisk"></i>`).join(" ");
   $("#cinta").innerHTML = `<span>${cinta}</span><span>${cinta}</span>`;
 
+  // Tarjeta flotante de la portada: la prenda destacada, se abre al tocarla
+  const destacado = PRODUCTOS.get(CONFIG.destacadoPortada);
+  if (destacado) {
+    const t = $("#portada-destacado");
+    t.dataset.abrir = destacado.id;
+    t.setAttribute("aria-label", `Ver ${destacado.nombre}`);
+    t.innerHTML = `<img src="${esc(destacado.colores[0].imagenes[0].replace(/w=\d+&h=\d+/, "w=120&h=160"))}" alt="" width="60" height="80">
+      <span><small>${esc(destacado.etiqueta || "Nueva colección")}</small><strong>${esc(destacado.nombre)}</strong><em>${soles(destacado.precio)}</em></span>
+      <i class="ph ph-arrow-up-right" aria-hidden="true"></i>`;
+    t.hidden = false;
+  }
+
   /* ---------- 2. Horarios y estado "Abierto ahora" (hora de Perú) ---------- */
   const DIAS = ["domingo", "lunes", "martes", "miércoles", "jueves", "viernes", "sábado"];
   const aMinutos = (hhmm) => { const [h, m] = hhmm.split(":").map(Number); return h * 60 + m; };
@@ -160,22 +172,24 @@
   const favs = new Set(leer("favs", []).filter((id) => PRODUCTOS.has(id)));
   let cuponAplicado = CONFIG.cupon && leer("cupon", null) === CONFIG.cupon.codigo ? CONFIG.cupon.codigo : null;
 
-  // Cada artículo es una prenda (producto + color + talla) o un look (varias prendas con sus tallas)
+  /* Cada artículo de la bolsa es:
+     - una prenda: { tipo: "prenda", id, color, talla, n }
+     - o un conjunto (look armado u outfit del probador):
+       { tipo: "look", id, nombre, descuento, piezas: [{ producto, color, talla }], n } */
   const bolsa = new Map();
-  const itemValido = (it) => {
-    if (it.tipo === "prenda") {
-      const p = PRODUCTOS.get(it.id);
-      return p && p.colores.some((c) => c.nombre === it.color) && p.tallas[it.talla] > 0;
-    }
-    const l = LOOKS.get(it.id);
-    return l && l.piezas.every((pz) => PRODUCTOS.get(pz.producto)?.tallas[it.tallas[pz.producto]] > 0);
+  const piezaValida = (pz) => {
+    const p = PRODUCTOS.get(pz.producto);
+    return p && p.colores.some((c) => c.nombre === pz.color) && p.tallas[pz.talla] > 0;
   };
+  const itemValido = (it) => it.tipo === "prenda"
+    ? piezaValida({ producto: it.id, color: it.color, talla: it.talla })
+    : Array.isArray(it.piezas) && it.piezas.length > 0 && it.piezas.every(piezaValida);
   leer("bolsa", []).forEach(([k, it]) => { if (it && it.n > 0 && itemValido(it)) bolsa.set(k, it); });
   const guardarBolsa = () => escribir("bolsa", [...bolsa]);
 
-  function precioLook(l) {
-    const suma = l.piezas.reduce((t, pz) => t + PRODUCTOS.get(pz.producto).precio, 0);
-    return { suma, precio: Math.round(suma * (1 - l.descuento / 100)) };
+  function precioConjunto(piezas, descuento) {
+    const suma = piezas.reduce((t, pz) => t + PRODUCTOS.get(pz.producto).precio, 0);
+    return { suma, precio: Math.round(suma * (1 - descuento / 100)) };
   }
 
   function infoItem(it) {
@@ -187,10 +201,9 @@
         imagen: colorDe(p, it.color).imagenes[0], max: p.tallas[it.talla],
       };
     }
-    const l = LOOKS.get(it.id);
-    const piezas = l.piezas.map((pz) => ({ p: PRODUCTOS.get(pz.producto), color: pz.color, talla: it.tallas[pz.producto] }));
+    const piezas = it.piezas.map((pz) => ({ ...pz, p: PRODUCTOS.get(pz.producto) }));
     return {
-      nombre: `Look ${l.nombre}`, precio: precioLook(l).precio, cat: piezas[0].p.categoria,
+      nombre: it.nombre, precio: precioConjunto(it.piezas, it.descuento).precio, cat: piezas[0].p.categoria,
       detalle: piezas.map(({ p, color, talla }) => `${p.nombre} ${color} (${talla})`).join(" + "),
       imagen: colorDe(piezas[0].p, piezas[0].color).imagenes[0],
       max: Math.min(...piezas.map(({ p, talla }) => p.tallas[talla])),
@@ -206,6 +219,10 @@
     actualizarBolsa();
     pop($("#bolsa-btn"));
     return n;
+  }
+  function agregarConjunto(id, nombre, descuento, piezas) {
+    const clave = `look:${id}|` + piezas.map((pz) => `${pz.producto}-${pz.color}-${pz.talla}`).join("|");
+    agregar(clave, { tipo: "look", id, nombre, descuento, piezas }, 1);
   }
 
   function cambiar(clave, delta) {
@@ -283,10 +300,14 @@
     if (stockTotal(p) > 0 && stockTotal(p) <= 4) tags.push('<span class="tag tag--pocas">Últimas unidades</span>');
     return tags.slice(0, 2).join("");
   }
+  // Fotos de Unsplash en dos tamaños: el celular descarga la versión liviana
+  const tamanos = (url) => /w=\d+&h=\d+/.test(url)
+    ? ` srcset="${esc(url.replace(/w=\d+&h=\d+/, "w=360&h=480"))} 360w, ${esc(url)} 600w" sizes="(min-width: 1100px) 23vw, (min-width: 720px) 31vw, 48vw"`
+    : "";
   function fotosTarjeta(p, color) {
     const [a, b] = color.imagenes;
-    return `<img class="img-1${b ? " tiene-2" : ""}" src="${esc(a)}" data-fallback="${fallback(p.categoria)}" alt="${esc(p.nombre)} color ${esc(color.nombre)}" width="600" height="800" loading="lazy" decoding="async">
-      ${b ? `<img class="img-2" src="${esc(b)}" alt="" width="600" height="800" loading="lazy" decoding="async">` : ""}`;
+    return `<img class="img-1${b ? " tiene-2" : ""}" src="${esc(a)}"${tamanos(a)} data-fallback="${fallback(p.categoria)}" alt="${esc(p.nombre)} color ${esc(color.nombre)}" width="600" height="800" loading="lazy" decoding="async">
+      ${b ? `<img class="img-2" src="${esc(b)}"${tamanos(b)} alt="" width="600" height="800" loading="lazy" decoding="async">` : ""}`;
   }
 
   grid.innerHTML = CONFIG.productos.map((p, i) => `
@@ -538,13 +559,31 @@
     <tbody>${g.filas.map(([t, ...m]) => `<tr><th scope="row">${esc(t)}</th>${m.map((v) => `<td>${esc(v)}</td>`).join("")}</tr>`).join("")}</tbody>`;
   $("#guia-consejo").innerHTML = `<i class="ph ph-lightbulb" aria-hidden="true"></i><span>${esc(g.consejo)}</span>`;
 
-  /* ---------- 8. Looks armados ---------- */
+  /* ---------- 8. Selector de talla compartido (looks y probador) ---------- */
+  function selectorTalla(p) {
+    const tallas = Object.entries(p.tallas);
+    return `<select data-pieza="${p.id}" aria-label="Talla de ${esc(p.nombre)}">
+      ${tallas.length === 1 ? "" : '<option value="">Talla</option>'}
+      ${tallas.map(([t, n]) => `<option value="${esc(t)}" ${n === 0 ? "disabled" : ""}>${esc(t)}${n === 0 ? " · agotada" : ""}</option>`).join("")}
+    </select>`;
+  }
+  // Devuelve { idProducto: talla } o marca los selects vacíos y devuelve null
+  function leerTallas(contenedor) {
+    const selects = $$("[data-pieza]", contenedor);
+    selects.forEach((s) => s.setAttribute("aria-invalid", String(!s.value)));
+    const vacio = selects.find((s) => !s.value);
+    if (vacio) { vacio.focus(); avisar("Elige la talla de cada prenda", "ph-warning-circle"); return null; }
+    return Object.fromEntries(selects.map((s) => [s.dataset.pieza, s.value]));
+  }
+  document.addEventListener("change", (e) => { if (e.target.matches("[data-pieza]")) e.target.removeAttribute("aria-invalid"); });
+
+  /* ---------- 9. Looks armados ---------- */
   const tabs = $("#looks-tabs");
   tabs.innerHTML = CONFIG.looks.map((l, i) =>
     `<button type="button" role="tab" id="tab-${l.id}" aria-controls="panel-${l.id}" aria-selected="${i === 0}" tabindex="${i === 0 ? 0 : -1}">${esc(l.nombre)}</button>`).join("");
 
   $("#looks-paneles").innerHTML = CONFIG.looks.map((l, i) => {
-    const { suma, precio } = precioLook(l);
+    const { suma, precio } = precioConjunto(l.piezas, l.descuento);
     const piezas = l.piezas.map((pz) => ({ ...pz, p: PRODUCTOS.get(pz.producto) }));
     return `<div class="look" role="tabpanel" id="panel-${l.id}" aria-labelledby="tab-${l.id}" ${i === 0 ? "" : "hidden"}>
       <div class="look__collage">
@@ -557,18 +596,11 @@
         <h3>${esc(l.nombre)}</h3>
         <p>${esc(l.descripcion)}</p>
         <ul class="piezas">
-          ${piezas.map(({ p, color }) => {
-            const tallas = Object.entries(p.tallas);
-            const unica = tallas.length === 1;
-            return `<li class="pieza">
+          ${piezas.map(({ p, color }) => `<li class="pieza">
               <img src="${esc(colorDe(p, color).imagenes[0])}" data-fallback="${fallback(p.categoria)}" alt="" loading="lazy">
               <div><strong>${esc(p.nombre)}</strong><small>${esc(color)} · ${soles(p.precio)}</small></div>
-              <select data-pieza="${p.id}" aria-label="Talla de ${esc(p.nombre)}">
-                ${unica ? "" : '<option value="">Talla</option>'}
-                ${tallas.map(([t, n]) => `<option value="${esc(t)}" ${n === 0 ? "disabled" : ""}>${esc(t)}${n === 0 ? " · agotada" : ""}</option>`).join("")}
-              </select>
-            </li>`;
-          }).join("")}
+              ${selectorTalla(p)}
+            </li>`).join("")}
         </ul>
         <div class="look__total">
           <strong>${soles(precio)}</strong><s>${soles(suma)}</s><span class="precio__ahorro">Ahorras ${soles(suma - precio)}</span>
@@ -595,21 +627,81 @@
     sig.focus();
   });
 
-  $("#looks-paneles").addEventListener("change", (e) => { if (e.target.matches("[data-pieza]")) e.target.removeAttribute("aria-invalid"); });
   $("#looks-paneles").addEventListener("click", (e) => {
     const b = e.target.closest("[data-agregar-look]");
     if (!b) return;
     const l = LOOKS.get(b.dataset.agregarLook);
-    const selects = $$("[data-pieza]", b.closest(".look"));
-    const vacios = selects.filter((s) => !s.value);
-    selects.forEach((s) => s.setAttribute("aria-invalid", String(!s.value)));
-    if (vacios.length) { vacios[0].focus(); avisar("Elige la talla de cada pieza", "ph-warning-circle"); return; }
-    const tallas = Object.fromEntries(selects.map((s) => [s.dataset.pieza, s.value]));
-    agregar(`look:${l.id}|${Object.values(tallas).join("-")}`, { tipo: "look", id: l.id, tallas }, 1);
+    const tallas = leerTallas(b.closest(".look"));
+    if (!tallas) return;
+    agregarConjunto(l.id, `Look ${l.nombre}`, l.descuento, l.piezas.map((pz) => ({ ...pz, talla: tallas[pz.producto] })));
     avisar(`Look ${l.nombre} en tu bolsa`);
   });
 
-  /* ---------- 9. Bolsa, envío, cupón y pedido por WhatsApp ---------- */
+  /* ---------- 10. El probador: combina una prenda de arriba con una de abajo ---------- */
+  const PR = CONFIG.probador;
+  const opciones = (cats) => CONFIG.productos
+    .filter((p) => cats.includes(p.categoria) && stockTotal(p) > 0)
+    .flatMap((p) => p.colores.map((c) => ({ p, color: c.nombre, imagen: c.imagenes[0] })));
+  const prob = { arriba: opciones(PR.arriba), abajo: opciones(PR.abajo), i: { arriba: 0, abajo: 0 } };
+  if (!prob.arriba.length || !prob.abajo.length) $("#probador").remove();
+  else {
+    $("#prob-desc").textContent = `${PR.descuento}%`;
+    const pintarProbador = (mitad, paso) => {
+      ["arriba", "abajo"].forEach((m) => {
+        if (mitad && m !== mitad) return;   // solo se redibuja la mitad que cambió (conserva la talla de la otra)
+        const o = prob[m][prob.i[m]];
+        const img = $(`#prob-img-${m}`);
+        img.src = o.imagen;
+        img.alt = `${o.p.nombre} color ${o.color}`;
+        img.dataset.fallback = fallback(o.p.categoria);
+        if (paso && !reduceMotion) { img.classList.remove("entra-der", "entra-izq"); void img.offsetWidth; img.classList.add(paso > 0 ? "entra-der" : "entra-izq"); }
+        $(`#prob-${m}`).innerHTML = `<img src="${esc(o.imagen)}" alt="" loading="lazy">
+          <div><small>${m === "arriba" ? "Arriba" : "Abajo"} · ${prob.i[m] + 1} de ${prob[m].length}</small>
+          <strong>${esc(o.p.nombre)}</strong><span>${esc(o.color)} · ${soles(o.p.precio)}</span></div>
+          ${selectorTalla(o.p)}`;
+      });
+      const piezas = ["arriba", "abajo"].map((m) => ({ producto: prob[m][prob.i[m]].p.id }));
+      const { suma, precio } = precioConjunto(piezas, PR.descuento);
+      $("#prob-total").innerHTML = `<strong>${soles(precio)}</strong><s>${soles(suma)}</s><span class="precio__ahorro">Ahorras ${soles(suma - precio)}</span>`;
+    };
+    const mover = (mitad, paso) => {
+      const n = prob[mitad].length;
+      prob.i[mitad] = (prob.i[mitad] + paso + n) % n;
+      pintarProbador(mitad, paso);
+    };
+    $("#espejo").addEventListener("click", (e) => {
+      const b = e.target.closest("[data-mover]");
+      if (b) mover(b.dataset.mover, Number(b.dataset.paso));
+    });
+    // En celular también se puede deslizar el dedo sobre cada mitad
+    $$(".espejo__mitad").forEach((mitad) => {
+      let x0 = null;
+      mitad.addEventListener("touchstart", (e) => { x0 = e.touches[0].clientX; }, { passive: true });
+      mitad.addEventListener("touchend", (e) => {
+        if (x0 === null) return;
+        const dx = e.changedTouches[0].clientX - x0;
+        if (Math.abs(dx) > 40) mover(mitad.dataset.mitad, dx < 0 ? 1 : -1);
+        x0 = null;
+      });
+    });
+    $("#prob-azar").addEventListener("click", () => {
+      ["arriba", "abajo"].forEach((m) => { prob.i[m] = Math.floor(Math.random() * prob[m].length); });
+      pintarProbador(null, 1);
+    });
+    $("#prob-agregar").addEventListener("click", () => {
+      const tallas = leerTallas($("#prob-ficha"));
+      if (!tallas) return;
+      const piezas = ["arriba", "abajo"].map((m) => {
+        const o = prob[m][prob.i[m]];
+        return { producto: o.p.id, color: o.color, talla: tallas[o.p.id] };
+      });
+      agregarConjunto("probador", "Outfit del probador", PR.descuento, piezas);
+      avisar("Tu outfit está en la bolsa");
+    });
+    pintarProbador();
+  }
+
+  /* ---------- 11. Bolsa, envío, cupón y pedido por WhatsApp ---------- */
   const drawer = $("#drawer");
   const form = $("#form-pedido");
 
@@ -619,7 +711,7 @@
       const importe = it.n * infoItem(it).precio;
       items += it.n;
       subtotal += importe;
-      // El cupón no se suma a otros descuentos: no aplica a looks ni a prendas en oferta
+      // El cupón no se suma a otros descuentos: no aplica a looks, outfits ni prendas en oferta
       if (it.tipo === "prenda" && !PRODUCTOS.get(it.id).precioAntes) baseCupon += importe;
     });
     const entrega = form.entrega.value;
@@ -701,7 +793,7 @@
     const msg = $("#cupon-msg");
     const pintarCupon = () => {
       msg.className = "cupon__msg ok";
-      msg.textContent = cuponAplicado ? `Cupón aplicado: ${CONFIG.cupon.texto}. No aplica a ofertas ni looks.` : "";
+      msg.textContent = cuponAplicado ? `Cupón aplicado: ${CONFIG.cupon.texto}. No aplica a ofertas, looks ni outfits.` : "";
       if (cuponAplicado) input.value = cuponAplicado;
     };
     const aplicar = () => {
@@ -778,7 +870,7 @@
     window.open(waLink(msg), "_blank", "noopener");
   });
 
-  /* ---------- 10. Toast ---------- */
+  /* ---------- 12. Toast ---------- */
   let toastTimer;
   function avisar(texto, icono = "ph-check-circle") {
     const t = $("#toast");
@@ -788,7 +880,7 @@
     toastTimer = setTimeout(() => t.classList.remove("visible"), 2200);
   }
 
-  /* ---------- 11. Logros con contador animado ---------- */
+  /* ---------- 13. Logros con contador animado ---------- */
   $("#logros").innerHTML = CONFIG.logros.map((l) =>
     `<li><strong data-valor="${l.valor}" data-dec="${l.decimales || 0}" data-sufijo="${esc(l.sufijo || "")}">0</strong><span>${esc(l.texto)}</span></li>`).join("");
   const animarNumero = (el) => {
@@ -809,7 +901,7 @@
     io.observe(el);
   });
 
-  /* ---------- 12. Opiniones, comunidad y preguntas ---------- */
+  /* ---------- 14. Opiniones, comunidad y preguntas ---------- */
   $("#testimonios").innerHTML = CONFIG.testimonios.map((t, i) => `
     <li class="testimonio" data-aos="fade-up" data-aos-delay="${i * 80}">
       <span class="testimonio__comilla" aria-hidden="true">“</span>
@@ -835,12 +927,12 @@
   $("#faq").innerHTML = CONFIG.preguntas.map((q) =>
     `<details><summary>${esc(q.p)}<i class="ph ph-plus" aria-hidden="true"></i></summary><p>${esc(q.r)}</p></details>`).join("");
 
-  /* ---------- 13. Ubicación y mapa ---------- */
+  /* ---------- 15. Ubicación y mapa ---------- */
   const { lat, lng } = CONFIG.ubicacion;
   $("#mapa").src = `https://www.google.com/maps?q=${lat},${lng}&z=17&output=embed`;
   $("#como-llegar").href = `https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}`;
 
-  /* ---------- 14. Header y menú móvil ---------- */
+  /* ---------- 16. Header y menú móvil ---------- */
   const header = $("#header");
   const onScroll = () => header.classList.toggle("scrolled", window.scrollY > 10);
   window.addEventListener("scroll", onScroll, { passive: true });
@@ -862,7 +954,7 @@
   nav.addEventListener("click", (e) => { if (e.target.closest("a")) cerrarMenu(); });
   document.addEventListener("keydown", (e) => { if (e.key === "Escape") cerrarMenu(); });
 
-  /* ---------- 15. SEO local: datos estructurados para Google ---------- */
+  /* ---------- 17. SEO local: datos estructurados para Google ---------- */
   const precios = CONFIG.productos.map((p) => p.precio);
   const ld = {
     "@context": "https://schema.org",
@@ -885,7 +977,7 @@
   script.textContent = JSON.stringify(ld);
   document.head.appendChild(script);
 
-  /* ---------- 16. Inicio ---------- */
+  /* ---------- 18. Inicio ---------- */
   actualizarFavs();
   aplicarFiltro();
   actualizarBolsa();

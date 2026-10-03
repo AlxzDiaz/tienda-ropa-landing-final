@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 380" fill="none" stroke="#D9B77E" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+  <!-- Adorno: dos hojas de monstera en línea dorada -->
+  <g transform="rotate(-14 160 200)">
+    <path d="M160 350C82 330 32 262 36 182C40 102 98 44 160 38C224 44 282 104 284 184C286 264 236 330 160 350Z"/>
+    <path d="M160 368V350C160 262 162 150 160 38"/>
+    <path d="M36 182C82 180 122 186 150 196M48 120C88 128 124 144 152 160M84 66C110 86 134 108 156 124"/>
+    <path d="M284 184C238 180 198 186 170 196M272 120C232 128 196 144 168 160M236 64C210 86 188 108 164 124"/>
+    <path d="M70 268C104 262 132 250 152 234M250 270C216 262 188 250 168 234"/>
+    <ellipse cx="128" cy="218" rx="7" ry="15" transform="rotate(-30 128 218)"/>
+    <ellipse cx="192" cy="218" rx="7" ry="15" transform="rotate(30 192 218)"/>
+    <ellipse cx="132" cy="140" rx="6" ry="12" transform="rotate(-35 132 140)"/>
+    <ellipse cx="188" cy="140" rx="6" ry="12" transform="rotate(35 188 140)"/>
+  </g>
+</svg>

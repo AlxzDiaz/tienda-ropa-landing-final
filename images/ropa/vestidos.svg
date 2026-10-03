@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 800" width="600" height="800">
-  <rect width="600" height="800" fill="#EFE6DA"/>
-  <circle cx="300" cy="380" r="230" fill="#F8F3EC"/>
-  <path d="M262 180h76l-8 60 70 330H200l70-330Z" fill="#D9CBB8"/><path d="M262 180c8 30 68 30 76 0" fill="none" stroke="#C3B19B" stroke-width="8"/><path d="M262 250h76" stroke="#A9472A" stroke-width="10"/>
-  <text x="300" y="730" text-anchor="middle" font-family="Georgia, serif" font-style="italic" font-size="34" fill="#A9472A">Vestidos</text>
+  <rect width="600" height="800" fill="#F6E6E3"/>
+  <circle cx="300" cy="380" r="230" fill="#FBF7F4"/>
+  <path d="M262 180h76l-8 60 70 330H200l70-330Z" fill="#E7D3CF"/><path d="M262 180c8 30 68 30 76 0" fill="none" stroke="#C9B3AE" stroke-width="8"/><path d="M262 250h76" stroke="#B23A5E" stroke-width="10"/>
+  <text x="300" y="730" text-anchor="middle" font-family="Georgia, serif" font-style="italic" font-size="34" fill="#B23A5E">Vestidos</text>
 </svg>

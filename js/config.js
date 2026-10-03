@@ -20,6 +20,12 @@ const CONFIG = {
   instagram: "@wayrastudio",
   hashtag: "#WayraLook",
 
+  // Prenda que aparece en la tarjeta flotante de la portada (id de un producto)
+  destacadoPortada: "vestido-camisero",
+
+  // Probador virtual: combina una prenda de arriba con una de abajo (id de categorías)
+  probador: { descuento: 10, arriba: ["blusas"], abajo: ["pantalones"] },
+
   direccion: "Jr. Loreto 245, frente a la Plaza de Armas",
   ciudad: "Puerto Maldonado",
   region: "Madre de Dios",

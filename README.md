@@ -28,6 +28,8 @@ tienda-ropa-landing/
 | Filtros por categoría | Filtros + **ordenar** por precio o novedades + filtro de **ofertas** |
 | Combo del día | **Oferta con cuenta regresiva** que se oculta sola al terminar |
 | — | **Looks armados**: 3 prendas juntas con descuento; se elige la talla de cada una |
+| — | **Probador virtual**: un espejo en forma de arco donde combinas una blusa con un pantalón (flechas o deslizando el dedo), botón "Sorpréndeme" y outfit con 10% de descuento |
+| — | **Tarjeta de la prenda destacada** en la portada: se toca y abre la prenda (`destacadoPortada` en config) |
 | — | **Cupón de descuento** (no se suma a ofertas ni a looks) |
 | Delivery o recojo | Delivery local, **envío a provincia** (ciudad, agencia y DNI) o recojo en tienda |
 | Aviso "agrega S/ X más" | **Barra de progreso** hacia el envío gratis |
@@ -40,14 +42,16 @@ tienda-ropa-landing/
 
 **Librerías (por CDN):** [Phosphor Icons](https://phosphoricons.com), [AOS](https://michalsnik.github.io/aos/) y Google Fonts (**Bodoni Moda** para títulos, estilo revista de moda, y **Manrope** para el texto).
 
-**Paleta "Arcilla & Selva":** espresso `#1A1411`, terracota `#A9472A` (botones, texto blanco 5.8:1), oro `#E3B566` (acentos, texto oscuro), salvia `#8FA07E` y fondos hueso y lino. Todos los pares de texto pasan el contraste 4.5:1.
+**Paleta "Esmeralda & Rubor" (boutique tropical):** esmeralda `#0E2A24` (header, footer y probador), frambuesa `#B23A5E` (botones, texto blanco 5.7:1), champaña `#D9B77E` (acentos, texto oscuro), menta `#A8C5B5` y fondos marfil `#FBF7F4` y rubor `#F6E6E3`. Todos los pares de texto pasan el contraste 4.5:1. Es distinta a propósito de las otras demos (restaurante, hostal y hotel).
+
+**Detalle botánico:** hojas de monstera en línea dorada (`images/hojas.svg`) detrás de la portada y en el probador.
 
 ## Personalizar para un cliente
 
 1. **`js/config.js`:**
    - **Datos básicos:** nombre, eslogan, WhatsApp (`51` + número, sin espacios), dirección, coordenadas, Instagram y hashtag.
    - **Ventas:** anuncios, calificación de Google, envíos (costos, montos para envío gratis y hora de corte), medios de pago, días para cambios, cupón y oferta con fecha de fin.
-   - **Catálogo:** categorías, guía de tallas, productos (colores con fotos y stock por talla) y looks.
+   - **Catálogo:** categorías, guía de tallas, productos (colores con fotos y stock por talla), looks, prenda destacada de la portada y categorías que usa el probador.
    - **Confianza:** logros, reseñas, fotos de la comunidad y preguntas frecuentes.
 2. **`index.html`:** cambia el `<title>`, la `meta description`, la `og:image`, las dos fotos del hero, la foto y la historia de "Nosotros", y el título de la oferta.
 3. **Logo:** reemplaza `images/logo.svg` y `favicon.svg`.
@@ -78,6 +82,8 @@ tienda-ropa-landing/
 - Para un cliente real, lo ideal es **fondo blanco o liso, la misma luz y el mismo encuadre** en todas las prendas. Así el catálogo se ve profesional aunque las fotos sean de celular.
 - Formato vertical **3:4 (600 × 800 px)** en **WebP** de menos de 120 KB. Comprímelas en [squoosh.app](https://squoosh.app).
 - La segunda foto de cada color aparece al pasar el mouse por la tarjeta (espalda, detalle o con la prenda puesta).
+- **Para el probador** usa fotos de cuerpo entero sobre fondo liso: la mitad de arriba del espejo muestra la blusa y la de abajo el pantalón.
+- En celular el catálogo descarga las fotos en tamaño reducido (360 px) gracias a `srcset`.
 
 ### Datos que deben ser reales
 

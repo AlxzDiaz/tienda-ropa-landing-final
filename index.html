@@ -6,7 +6,7 @@
   <!-- SEO: cambia título, descripción e imagen por cada cliente -->
   <title>Wayra Studio · Ropa de lino y estampados tropicales en Puerto Maldonado</title>
   <meta name="description" content="Vestidos de lino, blusas y pantalones frescos para el calor de la selva. Elige tu talla y pide por WhatsApp: delivery el mismo día en Puerto Maldonado y envíos a todo el Perú.">
-  <meta name="theme-color" content="#1A1411">
+  <meta name="theme-color" content="#0E2A24">
   <meta property="og:type" content="website">
   <meta property="og:title" content="Wayra Studio · Moda fresca en Puerto Maldonado">
   <meta property="og:description" content="Mira la colección, elige tu talla y pide por WhatsApp. Envíos a todo el Perú.">
@@ -17,6 +17,8 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="preconnect" href="https://images.unsplash.com">
+  <!-- La foto principal de la portada se pide primero (es lo más grande que ve el cliente al entrar) -->
+  <link rel="preload" as="image" href="https://images.unsplash.com/photo-1767396858128-85b1262a7677?auto=format&fit=crop&crop=faces&w=760&h=920&q=70" fetchpriority="high">
   <link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,500;0,6..96,600;0,6..96,700;1,6..96,500;1,6..96,600&family=Manrope:wght@400;500;700;800&display=swap" rel="stylesheet">
 
   <!-- Librerías: Phosphor Icons (íconos) + AOS (animaciones al hacer scroll) -->
@@ -48,9 +50,9 @@
       <nav class="nav" id="nav" aria-label="Principal">
         <ul>
           <li><a href="#coleccion">Colección</a></li>
+          <li><a href="#probador">Probador</a></li>
           <li><a href="#looks">Looks</a></li>
           <li><a href="#nosotros">Nosotros</a></li>
-          <li><a href="#opiniones">Opiniones</a></li>
           <li><a href="#tienda">Tienda</a></li>
         </ul>
       </nav>
@@ -107,10 +109,9 @@
             <defs><path id="circulo" d="M60,60 m-44,0 a44,44 0 1,1 88,0 a44,44 0 1,1 -88,0"/></defs>
             <text><textPath href="#circulo">Nueva colección · Primavera 2026 ·</textPath></text>
           </svg>
-          <div class="flotante">
-            <span class="flotante__ico"><i class="ph-fill ph-leaf" aria-hidden="true"></i></span>
-            <span><strong>Lino que respira</strong><small>Fresco hasta a 35 °C</small></span>
-          </div>
+          <!-- Tarjeta de la prenda destacada (se llena desde config.js) -->
+          <button class="flotante flotante--producto" type="button" id="portada-destacado" hidden></button>
+          <span class="chip-flotante"><i class="ph-fill ph-leaf" aria-hidden="true"></i>Lino que respira</span>
         </div>
       </div>
     </section>
@@ -187,6 +188,40 @@
         <div class="sin-resultados" id="sin-resultados" hidden>
           <i class="ph ph-heart" aria-hidden="true"></i>
           <p>Todavía no tienes favoritos. Toca el corazón de una prenda para guardarla aquí.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ PROBADOR VIRTUAL ============ -->
+    <section class="seccion probador" id="probador" aria-labelledby="probador-titulo">
+      <div class="container probador__grid">
+        <div class="probador__intro" data-aos="fade-up">
+          <span class="eyebrow eyebrow--oscura"><i class="ph-fill ph-magic-wand" aria-hidden="true"></i> Probador virtual</span>
+          <h2 id="probador-titulo">Combina y crea <em>tu outfit</em></h2>
+          <p>Cambia la prenda de arriba y la de abajo con las flechas hasta encontrar tu combinación. Si te llevas las dos, ahorras <strong id="prob-desc"></strong>.</p>
+          <button class="btn btn--claro" type="button" id="prob-azar"><i class="ph ph-shuffle" aria-hidden="true"></i>Sorpréndeme</button>
+        </div>
+
+        <div class="espejo-marco" data-aos="zoom-in">
+          <div class="espejo" id="espejo">
+            <div class="espejo__mitad" data-mitad="arriba">
+              <img alt="" id="prob-img-arriba">
+              <button class="espejo__flecha espejo__flecha--izq" type="button" data-mover="arriba" data-paso="-1" aria-label="Prenda de arriba anterior"><i class="ph ph-caret-left"></i></button>
+              <button class="espejo__flecha espejo__flecha--der" type="button" data-mover="arriba" data-paso="1" aria-label="Prenda de arriba siguiente"><i class="ph ph-caret-right"></i></button>
+            </div>
+            <div class="espejo__mitad" data-mitad="abajo">
+              <img alt="" id="prob-img-abajo">
+              <button class="espejo__flecha espejo__flecha--izq" type="button" data-mover="abajo" data-paso="-1" aria-label="Prenda de abajo anterior"><i class="ph ph-caret-left"></i></button>
+              <button class="espejo__flecha espejo__flecha--der" type="button" data-mover="abajo" data-paso="1" aria-label="Prenda de abajo siguiente"><i class="ph ph-caret-right"></i></button>
+            </div>
+          </div>
+        </div>
+
+        <div class="probador__ficha" id="prob-ficha" aria-live="polite" data-aos="fade-up" data-aos-delay="100">
+          <div class="pieza-prob" id="prob-arriba"></div>
+          <div class="pieza-prob" id="prob-abajo"></div>
+          <div class="look__total" id="prob-total"></div>
+          <button class="btn btn--primario btn--lg btn--bloque" type="button" id="prob-agregar"><i class="ph ph-tote-simple" aria-hidden="true"></i>Agregar outfit a la bolsa</button>
         </div>
       </div>
     </section>
